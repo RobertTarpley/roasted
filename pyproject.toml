@@ -1,8 +1,10 @@
 [project]
-reflex==0.8.6
 name = "roasted"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.9"
-dependencies = ["reflex>=0.6.8.post1"]
+description = "Coffee roasting tracker"
+requires-python = ">=3.11"
+dependencies = ["reflex>=0.8.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
