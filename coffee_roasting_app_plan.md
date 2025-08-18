@@ -5,8 +5,8 @@
 
 ### Step 1.1: Project Setup
 - [x] Initialize Reflex project with blank template
-- [ ] Set up basic app structure and routing
-- [ ] Create main layout with navigation
+- [x] Set up basic app structure and routing
+- [x] Create main layout with navigation
 
 ### Step 1.2: Basic Roast Timer
 - [ ] Create timer state (start time, current time, is_running)
@@ -158,11 +158,11 @@ class RoastState(rx.State):
     start_time: datetime = None
     current_time: datetime = None
     is_roasting: bool = False
-    
+
     # Events
     first_crack_time: datetime = None
     end_time: datetime = None
-    
+
     # Weights
     green_weight: float = 0.0
     roasted_weight: float = 0.0
@@ -173,8 +173,8 @@ class RoastState(rx.State):
 -- Green beans inventory
 green_beans: id, name, origin, type, score, purchase_date, quantity
 
--- Roast records  
-roasts: id, bean_id, green_weight, roasted_weight, start_time, 
+-- Roast records
+roasts: id, bean_id, green_weight, roasted_weight, start_time,
         first_crack_time, end_time, extraction_percentage, notes
 ```
 
