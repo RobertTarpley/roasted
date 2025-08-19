@@ -47,7 +47,7 @@ class AppState(rx.State):
     cooling_elapsed_seconds: int = 0
 
     # Event tracking
-    roast_events: List[dict] = []
+    roast_events: list[dict] = []
     first_crack_logged: bool = False
 
     # Roast data state

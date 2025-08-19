@@ -9,13 +9,13 @@ def timer_display() -> rx.Component:
     return rx.box(
         rx.heading(
             AppState.formatted_total_time,
-            size="9", 
+            size="9",
             text_align="center",
             color=AppState.timer_display_color
         ),
         rx.text(
             AppState.phase_description,
-            text_align="center", 
+            text_align="center",
             color="gray"
         ),
         padding="2rem",
@@ -30,33 +30,29 @@ def timer_display() -> rx.Component:
 def timer_controls() -> rx.Component:
     """Control buttons for the roasting process"""
     return rx.vstack(
-        rx.hstack(
-            rx.button(
-                "Start Roast",
-                size="4",
-                color_scheme="green",
-                width="100%",
-                on_click=AppState.start_roast,
-                disabled=AppState.roast_phase != "ready"
-            ),
-            rx.button(
-                "First Crack",
-                size="3",
-                color_scheme="orange",
-                disabled=(AppState.roast_phase != "roasting") | AppState.first_crack_logged,
-                width="100%",
-                on_click=AppState.log_first_crack
-            ),
-            rx.button(
-                "End Roast",
-                size="3",
-                color_scheme="red",
-                disabled=AppState.roast_phase != "roasting",
-                width="100%",
-                on_click=AppState.end_roast
-            ),
-            spacing="2",
+        rx.button(
+            "Start Roast",
+            size="4",
+            color_scheme="green",
             width="100%",
+            on_click=AppState.start_roast,
+            disabled=AppState.roast_phase != "ready"
+        ),
+        rx.button(
+            "First Crack",
+            size="3",
+            color_scheme="orange",
+            disabled=(AppState.roast_phase != "roasting") | AppState.first_crack_logged,
+            width="100%",
+            on_click=AppState.log_first_crack
+        ),
+        rx.button(
+            "End Roast",
+            size="3",
+            color_scheme="red",
+            disabled=AppState.roast_phase != "roasting",
+            width="100%",
+            on_click=AppState.end_roast
         ),
         spacing="2",
         width="100%",
@@ -75,7 +71,7 @@ def roast_events() -> rx.Component:
                     lambda event: rx.hstack(
                         rx.text(event["name"], font_weight="bold"),
                         rx.spacer(),
-                        rx.text(event["elapsed"], color="gray"),
+                        rx.text(event["elapsed"], color="white"),
                         width="100%",
                         justify="between"
                     )
@@ -111,7 +107,7 @@ def roast_events() -> rx.Component:
         padding="1rem",
         border="1px solid #e2e8f0",
         border_radius="0.5rem",
-        background="white",
+        background="#1f2937",
         width="100%",
         margin_top="2rem",
     )
