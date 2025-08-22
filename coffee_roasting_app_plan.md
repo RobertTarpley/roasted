@@ -9,15 +9,15 @@
 - [x] Create main layout with navigation
 
 ### Step 1.2: Basic Roast Timer
-- [ ] Create timer state (start time, current time, is_running)
-- [ ] Build timer display (shows elapsed time in MM:SS format)
-- [ ] Add Start/Stop/Reset timer buttons
-- [ ] Test timer functionality works correctly
+- [x] Create timer state (start time, current time, is_running)
+- [x] Build timer display (shows elapsed time in MM:SS format)
+- [x] Add Start/Stop/Reset timer buttons
+- [x] Test timer functionality works correctly
 
 ### Step 1.3: Roast Event Logging
-- [ ] Add "First Crack" button that logs timestamp
-- [ ] Add "End Roast" button that stops timer
-- [ ] Display logged events on screen during roast
+- [x] Add "First Crack" button that logs timestamp
+- [x] Add "End Roast" button that stops timer
+- [x] Display logged events on screen during roast
 - [ ] Calculate development time automatically
 
 **Milestone:** You can time a roast and log key events
