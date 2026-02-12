@@ -48,7 +48,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Add inventory persistence and roast linkage foundations
+- [x] 02-01-PLAN.md — Add inventory persistence and roast linkage foundations
 - [ ] 02-02-PLAN.md — Build inventory management UI for coffees, lots, and adjustments
 - [ ] 02-03-PLAN.md — Connect roasts to lots and add history filters
 
@@ -73,5 +73,5 @@ Phases execute in numeric order: 1 → 1.1 → 1.2 → 2 → 2.1 → 2.2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Roast Capture + Logs | 4/4 | Complete | 2026-02-12 |
-| 2. Inventory + History | 0/TBD | Not started | - |
+| 2. Inventory + History | 1/3 | In progress | - |
 | 3. Roast Comparison | 0/TBD | Not started | - |
