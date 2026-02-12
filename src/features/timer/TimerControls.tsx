@@ -12,7 +12,7 @@ const buttonBase =
 
 export const TimerControls = () => {
   const isRunning = useTimerStore((state) => state.isRunning);
-  const start = useTimerStore((state) => state.start);
+  const openPreRoast = useTimerStore((state) => state.openPreRoast);
   const stop = useTimerStore((state) => state.stop);
   const markFirstCrack = useTimerStore((state) => state.markFirstCrack);
   const markDrop = useTimerStore((state) => state.markDrop);
@@ -26,7 +26,7 @@ export const TimerControls = () => {
       return;
     }
 
-    start();
+    openPreRoast();
   };
 
   return (
