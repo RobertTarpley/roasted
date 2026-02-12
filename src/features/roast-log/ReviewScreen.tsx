@@ -11,17 +11,10 @@ import { derivePhaseTimes, deriveYieldPercent } from "@/domain/roast-session/der
 import { RoastEvent } from "@/domain/roast-session/types";
 import { useTimerStore } from "@/features/timer/timerStore";
 import { formatElapsedMsOrPlaceholder } from "@/shared/format/time";
+import { formatYieldPercent } from "@/shared/format/yield";
 
 const getEventTimestamp = (events: RoastEvent[], type: RoastEvent["type"]) =>
   events.find((event) => event.type === type)?.at ?? null;
-
-const formatYield = (yieldPercent: number | null) => {
-  if (yieldPercent == null) {
-    return "--";
-  }
-
-  return `${yieldPercent.toFixed(1)}%`;
-};
 
 export const ReviewScreen = () => {
   const events = useTimerStore((state) => state.events);
@@ -177,7 +170,7 @@ export const ReviewScreen = () => {
             Yield %
           </p>
           <p className="mt-2 text-lg font-semibold text-[#2c2218]">
-            {formatYield(yieldPercent)}
+            {formatYieldPercent(yieldPercent)}
           </p>
         </div>
       </div>

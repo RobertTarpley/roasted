@@ -11,6 +11,7 @@ import { type Coffee, type Lot } from "@/domain/inventory/types";
 import { derivePhaseTimes } from "@/domain/roast-session/derive";
 import { CompletedRoast, type RoastLevel } from "@/domain/roast-session/types";
 import { formatElapsedMsOrPlaceholder } from "@/shared/format/time";
+import { formatYieldPercent, resolveYieldPercent } from "@/shared/format/yield";
 
 const formatDateTime = (timestamp: number) =>
   new Intl.DateTimeFormat("en-US", {
@@ -19,21 +20,6 @@ const formatDateTime = (timestamp: number) =>
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(timestamp));
-
-const resolveYieldPercent = (roast: CompletedRoast): number | null => {
-  if (roast.yieldPercent != null) {
-    return roast.yieldPercent;
-  }
-
-  if (roast.lossPercent != null) {
-    return 100 - roast.lossPercent;
-  }
-
-  return null;
-};
-
-const formatYield = (yieldPercent: number | null) =>
-  yieldPercent == null ? "--" : `${yieldPercent.toFixed(1)}%`;
 
 const parseDateInput = (value: string): Date | null => {
   if (!value) {
@@ -208,12 +194,20 @@ export const HistoryScreen = () => {
               Recent roasts
             </h1>
           </div>
-          <Link
-            href="/"
-            className="text-xs uppercase tracking-[0.2em] text-[#8f7d6a] transition hover:text-[#2c2218]"
-          >
-            Back to timer
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/compare"
+              className="text-xs uppercase tracking-[0.2em] text-[#8f7d6a] transition hover:text-[#2c2218]"
+            >
+              Compare
+            </Link>
+            <Link
+              href="/"
+              className="text-xs uppercase tracking-[0.2em] text-[#8f7d6a] transition hover:text-[#2c2218]"
+            >
+              Back to timer
+            </Link>
+          </div>
         </div>
 
         <section className="mt-8 rounded-[32px] border border-[#eadfce] bg-white/90 px-6 py-6 shadow-[0_20px_60px_-40px_rgba(44,34,24,0.6)]">
@@ -365,7 +359,7 @@ export const HistoryScreen = () => {
                         Yield %
                       </p>
                       <p className="mt-2 text-lg font-semibold">
-                        {formatYield(resolveYieldPercent(roast))}
+                        {formatYieldPercent(resolveYieldPercent(roast))}
                       </p>
                     </div>
                 </div>
