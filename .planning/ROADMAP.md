@@ -12,7 +12,7 @@ This roadmap delivers a mobile-friendly roast timer and logging workflow first, 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Roast Capture + Logs** - Time roasts with phase splits and save core roast records
+- [x] **Phase 1: Roast Capture + Logs** - Time roasts with phase splits and save core roast records
 - [ ] **Phase 2: Inventory + History** - Manage lots/inventory and connect roasts to inventory-aware history
 - [ ] **Phase 3: Roast Comparison** - Compare roasts by phase timing and loss
 
@@ -31,8 +31,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Scaffold app, domain model, and persistence layer
-- [ ] 01-02-PLAN.md — Build timer UI, controls, and event markers
-- [ ] 01-03-PLAN.md — Add roast log save flow and history delete
+- [x] 01-02-PLAN.md — Build timer UI, controls, and event markers
+- [x] 01-03-PLAN.md — Add roast log save flow and history delete
 
 ### Phase 2: Inventory + History
 **Goal**: Users can manage green coffee lots and see inventory-aware roast history
@@ -69,6 +69,6 @@ Phases execute in numeric order: 1 → 1.1 → 1.2 → 2 → 2.1 → 2.2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Roast Capture + Logs | 1/3 | In progress | - |
+| 1. Roast Capture + Logs | 3/3 | Complete | 2026-02-12 |
 | 2. Inventory + History | 0/TBD | Not started | - |
 | 3. Roast Comparison | 0/TBD | Not started | - |
