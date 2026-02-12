@@ -22,6 +22,7 @@ type TimerState = {
   greenWeightGrams: number | null;
   roastedWeightGrams: number | null;
   notes: string;
+  lotId: number | null;
 };
 
 type TimerActions = {
@@ -38,6 +39,7 @@ type TimerActions = {
     roastedWeightGrams: number;
   }) => void;
   setNotes: (notes: string) => void;
+  setLotId: (lotId: number | null) => void;
   resetSession: () => void;
 };
 
@@ -105,6 +107,7 @@ export const useTimerStore = create<TimerStore>((set) => ({
   greenWeightGrams: null,
   roastedWeightGrams: null,
   notes: "",
+  lotId: null,
   openPreRoast: () => {
     set((state) => {
       if (state.isRunning || state.flowStep === "preRoast") {
@@ -141,6 +144,7 @@ export const useTimerStore = create<TimerStore>((set) => ({
         greenWeightGrams,
         roastedWeightGrams: null,
         notes: state.notes,
+        lotId: state.lotId,
       };
     });
   },
@@ -245,6 +249,12 @@ export const useTimerStore = create<TimerStore>((set) => ({
       notes,
     }));
   },
+  setLotId: (lotId) => {
+    set((state) => ({
+      ...state,
+      lotId,
+    }));
+  },
   resetSession: () => {
     set(() => ({
       isRunning: false,
@@ -256,6 +266,7 @@ export const useTimerStore = create<TimerStore>((set) => ({
       greenWeightGrams: null,
       roastedWeightGrams: null,
       notes: "",
+      lotId: null,
     }));
   },
 }));

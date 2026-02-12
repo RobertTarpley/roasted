@@ -24,6 +24,7 @@ export const ReviewScreen = () => {
   const roastLevel = useTimerStore((state) => state.roastLevel);
   const greenWeightGrams = useTimerStore((state) => state.greenWeightGrams);
   const roastedWeightGrams = useTimerStore((state) => state.roastedWeightGrams);
+  const lotId = useTimerStore((state) => state.lotId);
   const notes = useTimerStore((state) => state.notes);
   const setNotes = useTimerStore((state) => state.setNotes);
   const resetSession = useTimerStore((state) => state.resetSession);
@@ -55,6 +56,11 @@ export const ReviewScreen = () => {
       return;
     }
 
+    if (lotId == null) {
+      setSaveError("Select a lot before saving this roast.");
+      return;
+    }
+
     const startedAt = getEventTimestamp(events, "START");
     const endedAt = getEventTimestamp(events, "STOP");
     const computedYield = deriveYieldPercent(greenWeightGrams, roastedWeightGrams);
@@ -69,6 +75,7 @@ export const ReviewScreen = () => {
 
     try {
       await saveRoast({
+        lotId,
         startedAt,
         endedAt,
         roastLevel,
