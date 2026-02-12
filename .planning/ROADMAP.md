@@ -50,7 +50,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Add inventory persistence and roast linkage foundations
 - [x] 02-02-PLAN.md — Build inventory management UI for coffees, lots, and adjustments
-- [ ] 02-03-PLAN.md — Connect roasts to lots and add history filters
+- [x] 02-03-PLAN.md — Connect roasts to lots and add history filters
 
 ### Phase 3: Roast Comparison
 **Goal**: Users can compare roasts to improve consistency
