@@ -27,10 +27,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can mark First Crack and Drop/Bean Dump and see development and cooling times derived from those events
   3. User can add or edit event markers with timestamps during a roast
   4. User can stop a roast and save notes, roast level, weights in grams, and a calculated loss %
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Scaffold app, domain model, and persistence layer
+- [ ] 01-02-PLAN.md — Build timer UI, controls, and event markers
+- [ ] 01-03-PLAN.md — Add roast log save flow and history delete
 
 ### Phase 2: Inventory + History
 **Goal**: Users can manage green coffee lots and see inventory-aware roast history
