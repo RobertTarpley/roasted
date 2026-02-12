@@ -99,12 +99,20 @@ export const TimerScreen = () => {
               Live
             </span>
           </div>
-          <Link
-            href="/history"
-            className="text-xs uppercase tracking-[0.2em] text-[#8f7d6a] transition hover:text-[#2c2218]"
-          >
-            History
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/history"
+              className="text-xs uppercase tracking-[0.2em] text-[#8f7d6a] transition hover:text-[#2c2218]"
+            >
+              History
+            </Link>
+            <Link
+              href="/inventory"
+              className="text-xs uppercase tracking-[0.2em] text-[#8f7d6a] transition hover:text-[#2c2218]"
+            >
+              Inventory
+            </Link>
+          </div>
         </div>
 
         {flowStep === "review" ? (
