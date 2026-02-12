@@ -60,10 +60,10 @@ Plans:
   1. User can select 2-3 roasts to compare
   2. Comparison shows phase times and yield % for each selected roast
   3. Changing the selection updates the comparison view
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Add roast comparison screen with selection and metrics
 
 ## Progress
 
