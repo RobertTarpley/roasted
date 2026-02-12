@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { deriveLossPercent, derivePhaseTimes } from "@/domain/roast-session/derive";
 import { RoastEvent } from "@/domain/roast-session/types";
+import { saveRoast } from "@/data/roasts";
 import { useTimerStore } from "@/features/timer/timerStore";
 import { formatElapsedMsOrPlaceholder } from "@/shared/format/time";
 
@@ -29,6 +30,7 @@ export const ReviewScreen = () => {
 
   const [discardArmed, setDiscardArmed] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const phaseTimes = useMemo(() => derivePhaseTimes(events), [events]);
   const lossPercent = useMemo(() => {
@@ -39,7 +41,11 @@ export const ReviewScreen = () => {
     return deriveLossPercent(greenWeightGrams, roastedWeightGrams);
   }, [greenWeightGrams, roastedWeightGrams]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (isSaving) {
+      return;
+    }
+
     if (
       roastLevel == null ||
       greenWeightGrams == null ||
@@ -59,7 +65,26 @@ export const ReviewScreen = () => {
     }
 
     setSaveError(null);
-    resetSession();
+    setIsSaving(true);
+
+    try {
+      await saveRoast({
+        startedAt,
+        endedAt,
+        roastLevel,
+        greenWeightGrams,
+        roastedWeightGrams,
+        lossPercent: computedLoss,
+        notes: notes.trim() ? notes.trim() : undefined,
+        events,
+      });
+      resetSession();
+    } catch (error) {
+      console.error(error);
+      setSaveError("Failed to save roast. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDiscard = () => {
@@ -168,9 +193,10 @@ export const ReviewScreen = () => {
         <button
           type="button"
           onClick={handleSave}
-          className="h-12 flex-1 rounded-full bg-[#2c2218] text-sm font-semibold uppercase tracking-[0.18em] text-[#f7f2ea] transition hover:bg-[#20170f]"
+          disabled={isSaving}
+          className="h-12 flex-1 rounded-full bg-[#2c2218] text-sm font-semibold uppercase tracking-[0.18em] text-[#f7f2ea] transition hover:bg-[#20170f] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Save roast
+          {isSaving ? "Saving..." : "Save roast"}
         </button>
         <button
           type="button"
