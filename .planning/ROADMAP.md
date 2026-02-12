@@ -45,10 +45,12 @@ Plans:
   3. User can select a lot for each roast and see it associated in history
   4. Inventory auto-deducts using the roast green weight with gram-to-pound conversion
   5. User can filter roast history by coffee/lot, date, and roast level
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Add inventory persistence and roast linkage foundations
+- [ ] 02-02-PLAN.md — Build inventory management UI for coffees, lots, and adjustments
+- [ ] 02-03-PLAN.md — Connect roasts to lots and add history filters
 
 ### Phase 3: Roast Comparison
 **Goal**: Users can compare roasts to improve consistency
