@@ -19,10 +19,12 @@ export type RoastSessionState = {
   greenWeightGrams?: number;
   roastedWeightGrams?: number;
   notes?: string;
+  lotId?: number;
 };
 
 export type CompletedRoast = {
   id?: number;
+  lotId: number;
   startedAt: number;
   endedAt: number;
   roastLevel: RoastLevel;
