@@ -22,6 +22,13 @@ export class RoastTimerDatabase extends Dexie {
       lots: "++id, coffeeId, label, currentInventoryLbs",
       adjustments: "++id, lotId, createdAt, reason",
     });
+
+    this.version(3).stores({
+      roasts: "++id, startedAt, roastLevel, lotId",
+      coffees: "++id, name, origin, process",
+      lots: "++id, coffeeId, label, currentInventoryLbs, createdAt",
+      adjustments: "++id, lotId, createdAt, reason",
+    });
   }
 }
 
