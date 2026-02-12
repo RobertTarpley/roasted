@@ -30,7 +30,7 @@ export const derivePhaseTimes = (events: RoastEvent[]): RoastPhaseTimes => {
   };
 };
 
-export const deriveLossPercent = (
+export const deriveYieldPercent = (
   greenWeightGrams: number,
   roastedWeightGrams: number
 ): number | null => {
@@ -38,5 +38,5 @@ export const deriveLossPercent = (
     return null;
   }
 
-  return ((greenWeightGrams - roastedWeightGrams) / greenWeightGrams) * 100;
+  return (roastedWeightGrams / greenWeightGrams) * 100;
 };

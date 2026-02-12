@@ -3,19 +3,13 @@
 import { type FormEvent, useState } from "react";
 import { z } from "zod";
 
-import { RoastLevel } from "@/domain/roast-session/types";
-import { RoastLevelSchema } from "@/domain/roast-session/validation";
 import { useTimerStore } from "@/features/timer/timerStore";
 
-const roastLevels: RoastLevel[] = ["Light", "Medium", "Dark"];
-
 const PreRoastSchema = z.object({
-  roastLevel: RoastLevelSchema,
   greenWeightGrams: z.number().positive("Green weight must be greater than 0."),
 });
 
 type PreRoastErrors = {
-  roastLevel?: string;
   greenWeightGrams?: string;
 };
 
@@ -23,7 +17,6 @@ export const PreRoastForm = () => {
   const beginRoast = useTimerStore((state) => state.beginRoast);
   const cancelPreRoast = useTimerStore((state) => state.cancelPreRoast);
 
-  const [roastLevel, setRoastLevel] = useState<RoastLevel | "">("");
   const [greenWeight, setGreenWeight] = useState("");
   const [errors, setErrors] = useState<PreRoastErrors>({});
 
@@ -31,15 +24,11 @@ export const PreRoastForm = () => {
     event.preventDefault();
     const greenWeightGrams = Number(greenWeight);
 
-    const result = PreRoastSchema.safeParse({
-      roastLevel,
-      greenWeightGrams,
-    });
+    const result = PreRoastSchema.safeParse({ greenWeightGrams });
 
     if (!result.success) {
       const fieldErrors = result.error.formErrors.fieldErrors;
       setErrors({
-        roastLevel: fieldErrors.roastLevel?.[0],
         greenWeightGrams: fieldErrors.greenWeightGrams?.[0],
       });
       return;
@@ -70,37 +59,6 @@ export const PreRoastForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-5">
-        <fieldset>
-          <legend className="text-xs uppercase tracking-[0.3em] text-[#9a8774]">
-            Roast level
-          </legend>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            {roastLevels.map((level) => (
-              <label
-                key={level}
-                className={`flex cursor-pointer items-center justify-center rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
-                  roastLevel === level
-                    ? "border-[#2c2218] bg-[#2c2218] text-[#f7f2ea]"
-                    : "border-[#e0d3c3] bg-white text-[#2c2218] hover:bg-[#f5efe6]"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="roastLevel"
-                  value={level}
-                  checked={roastLevel === level}
-                  onChange={() => setRoastLevel(level)}
-                  className="sr-only"
-                />
-                {level}
-              </label>
-            ))}
-          </div>
-          {errors.roastLevel ? (
-            <p className="mt-2 text-sm text-[#b5542f]">{errors.roastLevel}</p>
-          ) : null}
-        </fieldset>
-
         <label className="flex flex-col gap-2">
           <span className="text-xs uppercase tracking-[0.3em] text-[#9a8774]">
             Green weight (grams)

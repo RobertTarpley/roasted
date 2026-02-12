@@ -27,13 +27,16 @@ type TimerState = {
 type TimerActions = {
   openPreRoast: () => void;
   cancelPreRoast: () => void;
-  beginRoast: (input: { roastLevel: RoastLevel; greenWeightGrams: number }) => void;
+  beginRoast: (input: { greenWeightGrams: number }) => void;
   markFirstCrack: () => void;
   markDrop: () => void;
   stop: () => void;
   deleteMarker: (type: "FIRST_CRACK" | "DROP") => void;
   focusMarker: (type: FocusedEventId) => void;
-  recordPostRoast: (input: { roastedWeightGrams: number }) => void;
+  recordPostRoast: (input: {
+    roastLevel: RoastLevel;
+    roastedWeightGrams: number;
+  }) => void;
   setNotes: (notes: string) => void;
   resetSession: () => void;
 };
@@ -120,7 +123,7 @@ export const useTimerStore = create<TimerStore>((set) => ({
       flowStep: "idle",
     }));
   },
-  beginRoast: ({ roastLevel, greenWeightGrams }) => {
+  beginRoast: ({ greenWeightGrams }) => {
     set((state) => {
       if (state.isRunning) {
         return state;
@@ -134,7 +137,7 @@ export const useTimerStore = create<TimerStore>((set) => ({
         events: [startEvent],
         focusedEventId: null,
         flowStep: "running",
-        roastLevel,
+        roastLevel: null,
         greenWeightGrams,
         roastedWeightGrams: null,
         notes: state.notes,
@@ -228,9 +231,10 @@ export const useTimerStore = create<TimerStore>((set) => ({
       focusedEventId: type,
     }));
   },
-  recordPostRoast: ({ roastedWeightGrams }) => {
+  recordPostRoast: ({ roastLevel, roastedWeightGrams }) => {
     set((state) => ({
       ...state,
+      roastLevel,
       roastedWeightGrams,
       flowStep: "review",
     }));

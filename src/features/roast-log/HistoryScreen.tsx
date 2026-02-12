@@ -17,7 +17,20 @@ const formatDateTime = (timestamp: number) =>
     minute: "2-digit",
   }).format(new Date(timestamp));
 
-const formatLoss = (lossPercent: number) => `${lossPercent.toFixed(1)}%`;
+const resolveYieldPercent = (roast: CompletedRoast): number | null => {
+  if (roast.yieldPercent != null) {
+    return roast.yieldPercent;
+  }
+
+  if (roast.lossPercent != null) {
+    return 100 - roast.lossPercent;
+  }
+
+  return null;
+};
+
+const formatYield = (yieldPercent: number | null) =>
+  yieldPercent == null ? "--" : `${yieldPercent.toFixed(1)}%`;
 
 export const HistoryScreen = () => {
   const [roasts, setRoasts] = useState<CompletedRoast[]>([]);
@@ -140,14 +153,14 @@ export const HistoryScreen = () => {
                       {formatDateTime(roast.startedAt)}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs uppercase tracking-[0.3em] text-[#9a8774]">
-                      Loss
-                    </p>
-                    <p className="mt-2 text-lg font-semibold">
-                      {formatLoss(roast.lossPercent)}
-                    </p>
-                  </div>
+                    <div className="text-right">
+                      <p className="text-xs uppercase tracking-[0.3em] text-[#9a8774]">
+                        Yield %
+                      </p>
+                      <p className="mt-2 text-lg font-semibold">
+                        {formatYield(resolveYieldPercent(roast))}
+                      </p>
+                    </div>
                 </div>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">

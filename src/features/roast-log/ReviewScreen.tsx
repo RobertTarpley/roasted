@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { deriveLossPercent, derivePhaseTimes } from "@/domain/roast-session/derive";
+import { derivePhaseTimes, deriveYieldPercent } from "@/domain/roast-session/derive";
 import { RoastEvent } from "@/domain/roast-session/types";
 import { saveRoast } from "@/data/roasts";
 import { useTimerStore } from "@/features/timer/timerStore";
@@ -11,12 +11,12 @@ import { formatElapsedMsOrPlaceholder } from "@/shared/format/time";
 const getEventTimestamp = (events: RoastEvent[], type: RoastEvent["type"]) =>
   events.find((event) => event.type === type)?.at ?? null;
 
-const formatLoss = (lossPercent: number | null) => {
-  if (lossPercent == null) {
+const formatYield = (yieldPercent: number | null) => {
+  if (yieldPercent == null) {
     return "--";
   }
 
-  return `${lossPercent.toFixed(1)}%`;
+  return `${yieldPercent.toFixed(1)}%`;
 };
 
 export const ReviewScreen = () => {
@@ -33,12 +33,12 @@ export const ReviewScreen = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const phaseTimes = useMemo(() => derivePhaseTimes(events), [events]);
-  const lossPercent = useMemo(() => {
+  const yieldPercent = useMemo(() => {
     if (greenWeightGrams == null || roastedWeightGrams == null) {
       return null;
     }
 
-    return deriveLossPercent(greenWeightGrams, roastedWeightGrams);
+    return deriveYieldPercent(greenWeightGrams, roastedWeightGrams);
   }, [greenWeightGrams, roastedWeightGrams]);
 
   const handleSave = async () => {
@@ -57,9 +57,9 @@ export const ReviewScreen = () => {
 
     const startedAt = getEventTimestamp(events, "START");
     const endedAt = getEventTimestamp(events, "STOP");
-    const computedLoss = deriveLossPercent(greenWeightGrams, roastedWeightGrams);
+    const computedYield = deriveYieldPercent(greenWeightGrams, roastedWeightGrams);
 
-    if (startedAt == null || endedAt == null || computedLoss == null) {
+    if (startedAt == null || endedAt == null || computedYield == null) {
       setSaveError("Missing timer data. Please restart the roast.");
       return;
     }
@@ -74,7 +74,7 @@ export const ReviewScreen = () => {
         roastLevel,
         greenWeightGrams,
         roastedWeightGrams,
-        lossPercent: computedLoss,
+        yieldPercent: computedYield,
         notes: notes.trim() ? notes.trim() : undefined,
         events,
       });
@@ -118,10 +118,10 @@ export const ReviewScreen = () => {
         </div>
         <div className="rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-4">
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#9a8774]">
-            Loss
+            Yield %
           </p>
           <p className="mt-2 text-lg font-semibold text-[#2c2218]">
-            {formatLoss(lossPercent)}
+            {formatYield(yieldPercent)}
           </p>
         </div>
       </div>

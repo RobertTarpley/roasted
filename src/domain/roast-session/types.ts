@@ -28,7 +28,8 @@ export type CompletedRoast = {
   roastLevel: RoastLevel;
   greenWeightGrams: number;
   roastedWeightGrams: number;
-  lossPercent: number;
+  yieldPercent: number;
+  lossPercent?: number;
   notes?: string;
   events: RoastEvent[];
 };
