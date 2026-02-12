@@ -4,13 +4,104 @@ import Link from "next/link";
 import { liveQuery } from "dexie";
 import { useEffect, useMemo, useState } from "react";
 
+import { listAdjustmentsForLot } from "@/data/adjustments";
 import { listCoffees } from "@/data/coffees";
 import { listLots } from "@/data/lots";
-import { Coffee, Lot } from "@/domain/inventory/types";
+import { Adjustment, Coffee, Lot } from "@/domain/inventory/types";
+import { AdjustmentForm } from "@/features/inventory/AdjustmentForm";
 import { CoffeeForm } from "@/features/inventory/CoffeeForm";
 import { LotForm } from "@/features/inventory/LotForm";
 
 const formatInventory = (value: number) => `${value.toFixed(3)} lbs`;
+
+const formatDateTime = (timestamp: number) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(timestamp));
+
+type AdjustmentListProps = {
+  lotId: number | undefined;
+};
+
+const AdjustmentList = ({ lotId }: AdjustmentListProps) => {
+  const [adjustments, setAdjustments] = useState<Adjustment[]>([]);
+  const [isLoading, setIsLoading] = useState(() => Boolean(lotId));
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!lotId) {
+      return;
+    }
+
+    const subscription = liveQuery(() => listAdjustmentsForLot(lotId)).subscribe({
+      next: (results) => {
+        setAdjustments(results);
+        setIsLoading(false);
+        setLoadError(null);
+      },
+      error: (error) => {
+        console.error(error);
+        setLoadError("Unable to load adjustments.");
+        setIsLoading(false);
+      },
+    });
+
+    return () => subscription.unsubscribe();
+  }, [lotId]);
+
+  if (!lotId) {
+    return (
+      <p className="mt-3 text-xs text-[#9a8774]">
+        Adjustments are available after saving a lot.
+      </p>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <p className="mt-3 text-xs text-[#9a8774]">Loading adjustments...</p>
+    );
+  }
+
+  if (loadError) {
+    return <p className="mt-3 text-xs text-[#9a8774]">{loadError}</p>;
+  }
+
+  if (adjustments.length === 0) {
+    return (
+      <p className="mt-3 text-xs text-[#9a8774]">No adjustments yet.</p>
+    );
+  }
+
+  return (
+    <ul className="mt-3 space-y-2 text-sm text-[#2c2218]">
+      {adjustments.map((adjustment) => (
+        <li key={adjustment.id ?? adjustment.createdAt}>
+          <div className="flex items-center justify-between">
+            <span className="text-xs uppercase tracking-[0.3em] text-[#9a8774]">
+              {adjustment.reason === "purchase" ? "Purchase" : "Correction"}
+            </span>
+            <span className="text-xs text-[#9a8774]">
+              {formatDateTime(adjustment.createdAt)}
+            </span>
+          </div>
+          <div className="mt-1 flex items-center justify-between">
+            <span>
+              {adjustment.amountLbs > 0
+                ? `+${adjustment.amountLbs.toFixed(3)}`
+                : adjustment.amountLbs.toFixed(3)}
+              {" "}
+              lbs
+            </span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 type LotCardProps = {
   lot: Lot;
@@ -43,6 +134,9 @@ const LotCard = ({ lot }: LotCardProps) => {
           </p>
         </div>
       </div>
+
+      <AdjustmentForm lotId={lot.id} />
+      <AdjustmentList lotId={lot.id} />
     </div>
   );
 };
