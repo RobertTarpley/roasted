@@ -61,7 +61,7 @@ Each task was committed atomically:
 1. **Task 1: Build inventory screen with coffee and lot creation** - `ba42ffe` (feat)
 2. **Task 2: Add lot adjustments and adjustment history** - `7eb0a9f` (feat)
 
-**Plan metadata:** [pending]
+**Plan metadata:** `7dd4ef2`
 
 ## Files Created/Modified
 - `src/app/inventory/page.tsx` - Inventory route entry point
