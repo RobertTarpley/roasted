@@ -22,13 +22,16 @@ type TimerState = {
   greenWeightGrams: number | null;
   roastedWeightGrams: number | null;
   notes: string;
-  lotId: number | null;
+  selectedLotId: number | null;
 };
 
 type TimerActions = {
   openPreRoast: () => void;
   cancelPreRoast: () => void;
-  beginRoast: (input: { greenWeightGrams: number }) => void;
+  beginRoast: (input: {
+    greenWeightGrams: number;
+    selectedLotId: number;
+  }) => void;
   markFirstCrack: () => void;
   markDrop: () => void;
   stop: () => void;
@@ -39,7 +42,7 @@ type TimerActions = {
     roastedWeightGrams: number;
   }) => void;
   setNotes: (notes: string) => void;
-  setLotId: (lotId: number | null) => void;
+  setSelectedLotId: (lotId: number | null) => void;
   resetSession: () => void;
 };
 
@@ -107,7 +110,7 @@ export const useTimerStore = create<TimerStore>((set) => ({
   greenWeightGrams: null,
   roastedWeightGrams: null,
   notes: "",
-  lotId: null,
+  selectedLotId: null,
   openPreRoast: () => {
     set((state) => {
       if (state.isRunning || state.flowStep === "preRoast") {
@@ -124,9 +127,10 @@ export const useTimerStore = create<TimerStore>((set) => ({
     set((state) => ({
       ...state,
       flowStep: "idle",
+      selectedLotId: null,
     }));
   },
-  beginRoast: ({ greenWeightGrams }) => {
+  beginRoast: ({ greenWeightGrams, selectedLotId }) => {
     set((state) => {
       if (state.isRunning) {
         return state;
@@ -144,7 +148,7 @@ export const useTimerStore = create<TimerStore>((set) => ({
         greenWeightGrams,
         roastedWeightGrams: null,
         notes: state.notes,
-        lotId: state.lotId,
+        selectedLotId,
       };
     });
   },
@@ -249,10 +253,10 @@ export const useTimerStore = create<TimerStore>((set) => ({
       notes,
     }));
   },
-  setLotId: (lotId) => {
+  setSelectedLotId: (lotId) => {
     set((state) => ({
       ...state,
-      lotId,
+      selectedLotId: lotId,
     }));
   },
   resetSession: () => {
@@ -266,7 +270,7 @@ export const useTimerStore = create<TimerStore>((set) => ({
       greenWeightGrams: null,
       roastedWeightGrams: null,
       notes: "",
-      lotId: null,
+      selectedLotId: null,
     }));
   },
 }));

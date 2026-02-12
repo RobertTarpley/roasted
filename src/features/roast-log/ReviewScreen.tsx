@@ -1,10 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { liveQuery } from "dexie";
+import { useEffect, useMemo, useState } from "react";
 
+import { listCoffees } from "@/data/coffees";
+import { listLots } from "@/data/lots";
+import { saveRoast } from "@/data/roasts";
+import { type Coffee, type Lot } from "@/domain/inventory/types";
 import { derivePhaseTimes, deriveYieldPercent } from "@/domain/roast-session/derive";
 import { RoastEvent } from "@/domain/roast-session/types";
-import { saveRoast } from "@/data/roasts";
 import { useTimerStore } from "@/features/timer/timerStore";
 import { formatElapsedMsOrPlaceholder } from "@/shared/format/time";
 
@@ -24,7 +28,7 @@ export const ReviewScreen = () => {
   const roastLevel = useTimerStore((state) => state.roastLevel);
   const greenWeightGrams = useTimerStore((state) => state.greenWeightGrams);
   const roastedWeightGrams = useTimerStore((state) => state.roastedWeightGrams);
-  const lotId = useTimerStore((state) => state.lotId);
+  const selectedLotId = useTimerStore((state) => state.selectedLotId);
   const notes = useTimerStore((state) => state.notes);
   const setNotes = useTimerStore((state) => state.setNotes);
   const resetSession = useTimerStore((state) => state.resetSession);
@@ -32,6 +36,26 @@ export const ReviewScreen = () => {
   const [discardArmed, setDiscardArmed] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [lots, setLots] = useState<Lot[]>([]);
+  const [coffees, setCoffees] = useState<Coffee[]>([]);
+
+  useEffect(() => {
+    const subscription = liveQuery(() => listLots()).subscribe({
+      next: (results) => setLots(results),
+      error: (error) => console.error(error),
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const subscription = liveQuery(() => listCoffees()).subscribe({
+      next: (results) => setCoffees(results),
+      error: (error) => console.error(error),
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const phaseTimes = useMemo(() => derivePhaseTimes(events), [events]);
   const yieldPercent = useMemo(() => {
@@ -41,6 +65,23 @@ export const ReviewScreen = () => {
 
     return deriveYieldPercent(greenWeightGrams, roastedWeightGrams);
   }, [greenWeightGrams, roastedWeightGrams]);
+
+  const selectedLotLabel = useMemo(() => {
+    if (selectedLotId == null) {
+      return "--";
+    }
+
+    const lotMap = new Map(lots.map((lot) => [lot.id, lot]));
+    const coffeeMap = new Map(coffees.map((coffee) => [coffee.id, coffee]));
+    const lot = lotMap.get(selectedLotId);
+
+    if (!lot) {
+      return "Unknown lot";
+    }
+
+    const coffee = coffeeMap.get(lot.coffeeId);
+    return `${coffee?.name ?? "Unknown coffee"} — ${lot.label}`;
+  }, [coffees, lots, selectedLotId]);
 
   const handleSave = async () => {
     if (isSaving) {
@@ -56,7 +97,7 @@ export const ReviewScreen = () => {
       return;
     }
 
-    if (lotId == null) {
+    if (selectedLotId == null) {
       setSaveError("Select a lot before saving this roast.");
       return;
     }
@@ -75,7 +116,7 @@ export const ReviewScreen = () => {
 
     try {
       await saveRoast({
-        lotId,
+        lotId: selectedLotId,
         startedAt,
         endedAt,
         roastLevel,
@@ -114,13 +155,21 @@ export const ReviewScreen = () => {
         </h2>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-4">
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#9a8774]">
             Roast level
           </p>
           <p className="mt-2 text-lg font-semibold text-[#2c2218]">
             {roastLevel ?? "--"}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-4">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#9a8774]">
+            Lot
+          </p>
+          <p className="mt-2 text-base font-semibold text-[#2c2218]">
+            {selectedLotLabel}
           </p>
         </div>
         <div className="rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-4">
