@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Make it effortless to time a roast and capture the key metrics and notes so I can track results over time.
-**Current focus:** Phase 1 - Roast Capture + Logs
+**Current focus:** Phase 2 - Inventory + History
 
 ## Current Position
 
-**Phase:** 1 of 3 (Roast Capture + Logs)
-**Current Plan:** 3
-**Total Plans in Phase:** 3
-**Status:** Phase complete — ready for verification
-**Last Activity:** 2026-02-12
+**Phase:** 2 of 3 (Inventory + History)
+**Current Plan:** 0
+**Total Plans in Phase:** TBD
+**Status:** Ready to plan
+**Last Activity:** 2026-02-12 (Phase 1 verified)
 
-**Progress:** [██████████] 100%
+**Progress:** [███░░░░░░░] 33%
 
 ## Performance Metrics
 

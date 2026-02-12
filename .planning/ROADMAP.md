@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Roast Capture + Logs** - Time roasts with phase splits and save core roast records
 - [ ] **Phase 2: Inventory + History** - Manage lots/inventory and connect roasts to inventory-aware history
-- [ ] **Phase 3: Roast Comparison** - Compare roasts by phase timing and loss
+- [ ] **Phase 3: Roast Comparison** - Compare roasts by phase timing and yield
 
 ## Phase Details
 
@@ -26,13 +26,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. User can start a roast timer and see overall elapsed time
   2. User can mark First Crack and Drop/Bean Dump and see development and cooling times derived from those events
   3. User can add or remove First Crack and Drop markers with timestamps during a roast (delete and re-add only; no direct edit)
-  4. User can stop a roast and save notes, roast level, weights in grams, and a calculated loss %
-**Plans**: 3 plans
+  4. User can stop a roast and save notes, roast level, weights in grams, and a calculated roast yield %
+**Plans**: 4 plans
 
 Plans:
 - [x] 01-01-PLAN.md — Scaffold app, domain model, and persistence layer
 - [x] 01-02-PLAN.md — Build timer UI, controls, and event markers
 - [x] 01-03-PLAN.md — Add roast log save flow and history delete
+- [x] 01-04-PLAN.md — Gap fixes for live splits, mobile layout, and yield %
 
 ### Phase 2: Inventory + History
 **Goal**: Users can manage green coffee lots and see inventory-aware roast history
@@ -55,7 +56,7 @@ Plans:
 **Requirements**: INS-01
 **Success Criteria** (what must be TRUE):
   1. User can select 2-3 roasts to compare
-  2. Comparison shows phase times and loss % for each selected roast
+  2. Comparison shows phase times and yield % for each selected roast
   3. Changing the selection updates the comparison view
 **Plans**: TBD
 
@@ -69,6 +70,6 @@ Phases execute in numeric order: 1 → 1.1 → 1.2 → 2 → 2.1 → 2.2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Roast Capture + Logs | 3/3 | Complete | 2026-02-12 |
+| 1. Roast Capture + Logs | 4/4 | Complete | 2026-02-12 |
 | 2. Inventory + History | 0/TBD | Not started | - |
 | 3. Roast Comparison | 0/TBD | Not started | - |

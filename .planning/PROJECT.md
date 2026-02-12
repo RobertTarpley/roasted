@@ -18,7 +18,7 @@ Make it effortless to time a roast and capture the key metrics and notes so I ca
 
 - [ ] Roast timer with split phases (overall, development, cooling) and saved metrics
 - [ ] Green coffee inventory with per-roast usage tracking
-- [ ] Roast history with notes, roast level, and roast loss %
+- [ ] Roast history with notes, roast level, and roast yield %
 
 ### Out of Scope
 

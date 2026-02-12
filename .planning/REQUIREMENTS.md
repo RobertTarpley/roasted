@@ -9,17 +9,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Roast Timing
 
-- [ ] **TIME-01**: User can start a roast timer that tracks overall elapsed time
-- [ ] **TIME-02**: User can mark "First Crack" to start development time from that event
-- [ ] **TIME-03**: User can mark "Drop/Bean Dump" to start cooling time from that event
-- [ ] **TIME-04**: User can stop a roast to finalize overall, development, and cooling times
-- [ ] **TIME-05**: User can add/edit event markers (e.g., color change) with timestamps
+- [x] **TIME-01**: User can start a roast timer that tracks overall elapsed time
+- [x] **TIME-02**: User can mark "First Crack" to start development time from that event
+- [x] **TIME-03**: User can mark "Drop/Bean Dump" to start cooling time from that event
+- [x] **TIME-04**: User can stop a roast to finalize overall, development, and cooling times
+- [x] **TIME-05**: User can add/remove First Crack and Drop markers with timestamps (corrections by delete and re-add)
 
 ### Roast Records
 
-- [ ] **LOG-01**: User can save a roast log with notes and roast level
-- [ ] **LOG-02**: User can enter green weight (grams) and roasted weight (grams)
-- [ ] **LOG-03**: System calculates roast loss % as (green - roasted) / green
+- [x] **LOG-01**: User can save a roast log with notes and roast level
+- [x] **LOG-02**: User can enter green weight (grams) and roasted weight (grams)
+- [x] **LOG-03**: System calculates roast yield % as (roasted / green) * 100
 - [ ] **LOG-04**: User can view roast history and filter by coffee/lot, date, and roast level
 
 ### Inventory
@@ -31,7 +31,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Insights
 
-- [ ] **INS-01**: User can compare 2-3 roasts by phase times and loss %
+- [ ] **INS-01**: User can compare 2-3 roasts by phase times and yield %
 
 ## v2 Requirements
 
@@ -62,14 +62,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TIME-01 | Phase 1 | Pending |
-| TIME-02 | Phase 1 | Pending |
-| TIME-03 | Phase 1 | Pending |
-| TIME-04 | Phase 1 | Pending |
-| TIME-05 | Phase 1 | Pending |
-| LOG-01 | Phase 1 | Pending |
-| LOG-02 | Phase 1 | Pending |
-| LOG-03 | Phase 1 | Pending |
+| TIME-01 | Phase 1 | Complete |
+| TIME-02 | Phase 1 | Complete |
+| TIME-03 | Phase 1 | Complete |
+| TIME-04 | Phase 1 | Complete |
+| TIME-05 | Phase 1 | Complete |
+| LOG-01 | Phase 1 | Complete |
+| LOG-02 | Phase 1 | Complete |
+| LOG-03 | Phase 1 | Complete |
 | LOG-04 | Phase 2 | Pending |
 | INVT-01 | Phase 2 | Pending |
 | INVT-02 | Phase 2 | Pending |
@@ -84,4 +84,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-12*
-*Last updated: 2026-02-12 after roadmap mapping*
+*Last updated: 2026-02-12 after Phase 1 completion*
