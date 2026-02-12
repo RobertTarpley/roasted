@@ -45,6 +45,34 @@ export const TimerScreen = () => {
   }, [focusedEventId, focusMarker]);
 
   const phaseTimes = useMemo(() => derivePhaseTimes(events), [events]);
+  const livePhaseTimes = useMemo(() => {
+    const firstCrackAt = events.find((event) => event.type === "FIRST_CRACK")?.at ?? null;
+    const dropAt = events.find((event) => event.type === "DROP")?.at ?? null;
+    const stopAt = events.find((event) => event.type === "STOP")?.at ?? null;
+
+    const developmentMs =
+      firstCrackAt == null
+        ? null
+        : dropAt != null
+          ? Math.max(0, dropAt - firstCrackAt)
+          : isRunning
+            ? Math.max(0, now - firstCrackAt)
+            : null;
+
+    const coolingMs =
+      dropAt == null
+        ? null
+        : stopAt != null
+          ? Math.max(0, stopAt - dropAt)
+          : isRunning
+            ? Math.max(0, now - dropAt)
+            : null;
+
+    return {
+      developmentMs,
+      coolingMs,
+    };
+  }, [events, isRunning, now]);
 
   const totalMs =
     isRunning && startAt != null ? Math.max(0, now - startAt) : phaseTimes.totalMs;
@@ -61,7 +89,7 @@ export const TimerScreen = () => {
 
   return (
     <div className="min-h-screen bg-[#f7f2ea] text-[#2c2218]">
-      <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-6 pb-32 pt-12">
+      <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-6 pb-44 pt-12 sm:pb-32">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <p className="text-xs uppercase tracking-[0.3em] text-[#8f7d6a]">
@@ -113,7 +141,7 @@ export const TimerScreen = () => {
                   Development
                 </p>
                 <p className="mt-2 text-2xl font-semibold">
-                  {formatElapsedMsOrPlaceholder(phaseTimes.developmentMs)}
+                  {formatElapsedMsOrPlaceholder(livePhaseTimes.developmentMs)}
                 </p>
               </div>
               <div className="rounded-3xl border border-[#eadfce] bg-white/70 px-4 py-4">
@@ -121,7 +149,7 @@ export const TimerScreen = () => {
                   Cooling
                 </p>
                 <p className="mt-2 text-2xl font-semibold">
-                  {formatElapsedMsOrPlaceholder(phaseTimes.coolingMs)}
+                  {formatElapsedMsOrPlaceholder(livePhaseTimes.coolingMs)}
                 </p>
               </div>
             </section>

@@ -30,7 +30,7 @@ export const TimerControls = () => {
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 w-[min(480px,90vw)] -translate-x-1/2">
+    <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-1/2 w-[min(480px,90vw)] -translate-x-1/2">
       <div className="rounded-[32px] border border-[#e0d3c3] bg-white/80 p-4 shadow-[0_24px_60px_-40px_rgba(44,34,24,0.7)] backdrop-blur">
         <div className="flex flex-col gap-3">
           <button
