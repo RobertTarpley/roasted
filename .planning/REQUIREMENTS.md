@@ -62,26 +62,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TIME-01 | Phase TBD | Pending |
-| TIME-02 | Phase TBD | Pending |
-| TIME-03 | Phase TBD | Pending |
-| TIME-04 | Phase TBD | Pending |
-| TIME-05 | Phase TBD | Pending |
-| LOG-01 | Phase TBD | Pending |
-| LOG-02 | Phase TBD | Pending |
-| LOG-03 | Phase TBD | Pending |
-| LOG-04 | Phase TBD | Pending |
-| INVT-01 | Phase TBD | Pending |
-| INVT-02 | Phase TBD | Pending |
-| INVT-03 | Phase TBD | Pending |
-| INVT-04 | Phase TBD | Pending |
-| INS-01 | Phase TBD | Pending |
+| TIME-01 | Phase 1 | Pending |
+| TIME-02 | Phase 1 | Pending |
+| TIME-03 | Phase 1 | Pending |
+| TIME-04 | Phase 1 | Pending |
+| TIME-05 | Phase 1 | Pending |
+| LOG-01 | Phase 1 | Pending |
+| LOG-02 | Phase 1 | Pending |
+| LOG-03 | Phase 1 | Pending |
+| LOG-04 | Phase 2 | Pending |
+| INVT-01 | Phase 2 | Pending |
+| INVT-02 | Phase 2 | Pending |
+| INVT-03 | Phase 2 | Pending |
+| INVT-04 | Phase 2 | Pending |
+| INS-01 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-12*
-*Last updated: 2026-02-12 after initial definition*
+*Last updated: 2026-02-12 after roadmap mapping*
