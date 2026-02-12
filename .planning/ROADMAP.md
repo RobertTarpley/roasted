@@ -25,12 +25,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Success Criteria** (what must be TRUE):
   1. User can start a roast timer and see overall elapsed time
   2. User can mark First Crack and Drop/Bean Dump and see development and cooling times derived from those events
-  3. User can add or edit event markers with timestamps during a roast
+  3. User can add or remove First Crack and Drop markers with timestamps during a roast (delete and re-add only; no direct edit)
   4. User can stop a roast and save notes, roast level, weights in grams, and a calculated loss %
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Scaffold app, domain model, and persistence layer
+- [x] 01-01-PLAN.md — Scaffold app, domain model, and persistence layer
 - [ ] 01-02-PLAN.md — Build timer UI, controls, and event markers
 - [ ] 01-03-PLAN.md — Add roast log save flow and history delete
 
@@ -69,6 +69,6 @@ Phases execute in numeric order: 1 → 1.1 → 1.2 → 2 → 2.1 → 2.2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Roast Capture + Logs | 0/TBD | Not started | - |
+| 1. Roast Capture + Logs | 1/3 | In progress | - |
 | 2. Inventory + History | 0/TBD | Not started | - |
 | 3. Roast Comparison | 0/TBD | Not started | - |
