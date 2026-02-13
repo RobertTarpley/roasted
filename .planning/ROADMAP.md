@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 1 plan
 
 Plans:
-- [ ] 04-01-PLAN.md — Passcode gate flow, session lock, and privacy notice
+- [x] 04-01-PLAN.md — Passcode gate flow, session lock, and privacy notice
 
 ### Phase 5: PWA Install + Offline Shell
 **Goal**: Users can install and launch the app as a private PWA
@@ -51,5 +51,5 @@ Phases execute in numeric order: 4 → 4.1 → 4.2 → 5 → 5.1 → 5.2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 4. Private Access Gate | 0/TBD | Not started | - |
+| 4. Private Access Gate | 1/1 | Complete | 2026-02-13 |
 | 5. PWA Install + Offline Shell | 0/TBD | Not started | - |
