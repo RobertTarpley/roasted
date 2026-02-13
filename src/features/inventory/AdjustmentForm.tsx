@@ -37,8 +37,7 @@ export const AdjustmentForm = ({ lotId }: AdjustmentFormProps) => {
     });
 
     if (!result.success) {
-      const fieldErrors =
-        "error" in result ? result.error.formErrors.fieldErrors : {};
+      const fieldErrors = result.error.flatten().fieldErrors;
       setErrors({
         lotId:
           fieldErrors.lotId?.[0] ??
