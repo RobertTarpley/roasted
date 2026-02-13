@@ -71,6 +71,7 @@ export default function AccessPage() {
                   value={passcode}
                   onChange={(event) => setPasscode(event.target.value)}
                   autoComplete="current-password"
+                  suppressHydrationWarning
                   className="h-12 flex-1 rounded-2xl border border-[#e0d3c3] bg-white px-4 text-base text-[#2c2218] shadow-sm focus:border-[#2c2218] focus:outline-none"
                   placeholder="Enter passcode"
                   required

@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Time a roast with phase splits and save complete roast records (notes, roast level, weights, loss %). No inventory, history filters, or comparisons in this phase.
+Time a roast with phase splits and save complete roast records (notes, roast level, weights, yield %). No inventory, history filters, or comparisons in this phase.
 
 </domain>
 
@@ -17,6 +17,8 @@ Time a roast with phase splits and save complete roast records (notes, roast lev
 - Full-screen timer layout with minimal chrome
 - Bottom-center sticky Start/Stop button
 - Timer shows total time plus all phase durations once they exist, with placeholders before
+- Split timers (development and cooling) count up live once started
+- Controls must not obstruct split timers in mobile view
 - Two-tier controls: Start/Stop primary, First Crack/Drop secondary
 
 ### Event markers
@@ -30,6 +32,7 @@ Time a roast with phase splits and save complete roast records (notes, roast lev
 - Notes are optional and free-text only
 - Roast level options: Light / Medium / Dark
 - Green weight entered before roast; roasted weight entered after roast
+- Roast level captured at end of roast alongside roasted weight
 
 ### Save/confirmation
 - Flow: Stop ends cooling → enter roasted weight → review screen with Save or Discard

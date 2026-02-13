@@ -37,10 +37,17 @@ export const AdjustmentForm = ({ lotId }: AdjustmentFormProps) => {
     });
 
     if (!result.success) {
-      const fieldErrors = result.error.formErrors.fieldErrors;
+      const fieldErrors =
+        "error" in result ? result.error.formErrors.fieldErrors : {};
       setErrors({
-        lotId: fieldErrors.lotId?.[0],
-        amountLbs: fieldErrors.amountLbs?.[0],
+        lotId:
+          fieldErrors.lotId?.[0] ??
+          (lotId === undefined ? "Select a lot to adjust." : undefined),
+        amountLbs:
+          fieldErrors.amountLbs?.[0] ??
+          (Number.isNaN(parsedAmount)
+            ? "Enter an adjustment amount."
+            : undefined),
         reason: fieldErrors.reason?.[0],
       });
       return;

@@ -10,7 +10,10 @@ export default function proxy(request: NextRequest) {
   const isIgnoredPath =
     pathname === ACCESS_PATH ||
     pathname === "/favicon.ico" ||
+    pathname === "/manifest.webmanifest" ||
+    pathname === "/sw.js" ||
     pathname.startsWith("/api") ||
+    pathname.startsWith("/icons/") ||
     pathname.startsWith("/_next/static") ||
     pathname.startsWith("/_next/image");
 
