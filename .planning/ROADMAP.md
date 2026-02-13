@@ -26,10 +26,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can unlock with the current passcode, and the unlock persists for the session until they lock
   3. Changing the server-configured passcode causes the previous passcode to fail on next unlock
   4. User sees a brief privacy notice explaining the passcode is a personal gate
-**Plans**: 1 plan
+**Plans**: 2 plans
 
 Plans:
 - [x] 04-01-PLAN.md — Passcode gate flow, session lock, and privacy notice
+- [x] 04-02-PLAN.md — Add root proxy gate artifact for verification
 
 ### Phase 5: PWA Install + Offline Shell
 **Goal**: Users can install and launch the app as a private PWA
@@ -51,5 +52,5 @@ Phases execute in numeric order: 4 → 4.1 → 4.2 → 5 → 5.1 → 5.2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 4. Private Access Gate | 1/1 | Complete | 2026-02-13 |
+| 4. Private Access Gate | 2/2 | Complete | 2026-02-13 |
 | 5. PWA Install + Offline Shell | 0/TBD | Not started | - |
