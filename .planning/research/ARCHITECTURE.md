@@ -1,196 +1,172 @@
 # Architecture Research
 
-**Domain:** Coffee roasting timer + green coffee inventory (single-user mobile-first)
+**Domain:** Private access gate + installable PWA for a single-user Next.js + Dexie app
 **Researched:** 2026-02-12
-**Confidence:** LOW
+**Confidence:** MEDIUM
 
 ## Standard Architecture
 
 ### System Overview
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                         Presentation Layer                       │
-├──────────────────────────────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │
-│  │ Timer UI     │  │ Roast Log UI │  │ Inventory UI│            │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬──────┘            │
-│         │                 │                 │                   │
-├─────────┴─────────────────┴─────────────────┴───────────────────┤
-│                         Application Layer                         │
-├──────────────────────────────────────────────────────────────────┤
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │ Roast Session Engine (FSM + event log + derived metrics)    │  │
-│  ├────────────────────────────────────────────────────────────┤  │
-│  │ Inventory Ledger (green in, roasted out, unit conversions)  │  │
-│  ├────────────────────────────────────────────────────────────┤  │
-│  │ Notes & Metadata (roast level, notes, tags, profile)        │  │
-│  ├────────────────────────────────────────────────────────────┤  │
-│  │ Sync/Export (optional: CSV, backup, cloud)                  │  │
-│  └────────────────────────────────────────────────────────────┘  │
-├──────────────────────────────────────────────────────────────────┤
-│                             Data Layer                            │
-├──────────────────────────────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │
-│  │ Local DB     │  │ File Export  │  │ Settings     │            │
-│  └──────────────┘  └──────────────┘  └──────────────┘            │
-└──────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                          Presentation Layer                           │
+├──────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────────┐  ┌───────────────────┐  ┌──────────────────┐   │
+│  │ Access Gate UI   │  │ Main App Shell    │  │ Install UI       │   │
+│  └────────┬─────────┘  └────────┬──────────┘  └────────┬─────────┘   │
+│           │                     │                     │              │
+├───────────┴─────────────────────┴─────────────────────┴──────────────┤
+│                         Client Application Layer                      │
+├──────────────────────────────────────────────────────────────────────┤
+│  ┌────────────────────────────────────────────────────────────────┐  │
+│  │ Access Control Service (passcode setup, verify, lock)           │  │
+│  ├────────────────────────────────────────────────────────────────┤  │
+│  │ Crypto Utilities (salt + PBKDF2, verify)                        │  │
+│  ├────────────────────────────────────────────────────────────────┤  │
+│  │ PWA Registration (manifest link + service worker registration)  │  │
+│  └────────────────────────────────────────────────────────────────┘  │
+├──────────────────────────────────────────────────────────────────────┤
+│                              Data Layer                               │
+├──────────────────────────────────────────────────────────────────────┤
+│  ┌────────────────────┐  ┌────────────────────┐  ┌────────────────┐ │
+│  │ Dexie DB (auth)    │  │ Dexie DB (app data)│  │ CacheStorage   │ │
+│  └────────────────────┘  └────────────────────┘  └────────────────┘ │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Component Responsibilities
 
 | Component | Responsibility | Typical Implementation |
 |-----------|----------------|------------------------|
-| Timer UI | Start/stop timer, mark first crack, dump, cooling, show splits and live deltas | Stateful UI with live ticks and large controls for mobile |
-| Roast Log UI | Review sessions, edit notes, view metrics, attach coffee | List/detail views with computed stats |
-| Inventory UI | View green stock, lots, roast history impact | List views with ledger summaries |
-| Roast Session Engine | Single source of truth for timer state, phase splits, derived metrics | Finite state machine + event log + derived model |
-| Inventory Ledger | Tracks weight in/out, unit normalization, roast loss % | Append-only entries with conversions |
-| Notes & Metadata | Captures roast notes, roast level, tags, coffee selection | Form handling + validation |
-| Local DB | Persistence of coffees, roast sessions, ledger entries, settings | IndexedDB/SQLite/local storage abstraction |
-| Sync/Export | Backup to file or cloud, CSV export for logs/ledger | Async background tasks |
+| Access Gate UI (NEW) | Setup passcode, unlock, lock, error states | Client-only screen rendered before main app |
+| Access Control Service (NEW) | Decide gate state, verify passcode, manage session unlock | Hook + context provider with Dexie access |
+| Crypto Utilities (NEW) | Derive key/hash from passcode, compare | Web Crypto `SubtleCrypto` PBKDF2 + digest |
+| Install UI (NEW) | Show install hint or install button | Banner/modal tied to PWA readiness |
+| PWA Registration (NEW) | Register service worker; link manifest | Client effect in root layout |
+| Service Worker (NEW) | Cache app shell and assets | `public/sw.js` with CacheStorage |
+| Dexie Auth Store (NEW) | Persist passcode salt/hash + metadata | `auth` table in IndexedDB |
+| App Shell (MODIFIED) | Wrap routes with access guard | Root layout or route group guard |
 
 ## Recommended Project Structure
 
 ```
 src/
-├── app/                 # App shell, routing, global providers
+├── app/                         # Next.js app routes + layouts
+│   ├── (gate)/                  # Passcode setup/unlock routes
+│   ├── (app)/                   # Existing app routes (protected)
+│   └── layout.tsx               # Root layout; access + PWA providers
 ├── features/
-│   ├── timer/           # Roast session UI + state machine
-│   ├── roast-log/       # Roast history, detail, editing
-│   ├── inventory/       # Green coffee lots and ledger views
-│   └── coffees/         # Coffee catalog (origin, lot, vendor)
-├── domain/
-│   ├── roast-session/   # FSM, event log, derived metrics
-│   ├── inventory/       # Ledger, unit conversions, loss calc
-│   └── measurements/    # Units and conversions (g/lb)
-├── data/                # Persistence adapters, repositories
-├── shared/              # UI components, formatting, utilities
-└── integrations/        # Export/sync (optional)
+│   ├── access/                  # Gate UI + hooks (NEW)
+│   └── pwa/                     # Install UI + SW registration (NEW)
+├── db/
+│   ├── index.ts                 # Dexie instance (MODIFIED)
+│   └── schema.ts                # Auth table + migrations (MODIFIED)
+├── lib/
+│   ├── crypto/                  # PBKDF2 + digest helpers (NEW)
+│   └── session/                 # Session unlock helpers (NEW)
+public/
+├── manifest.webmanifest         # PWA manifest (NEW)
+└── sw.js                        # Service worker (NEW)
 ```
 
 ### Structure Rationale
 
-- **features/:** Keeps UI and flows grouped by user tasks (timer, inventory, logs).
-- **domain/:** Pure business logic isolated from UI and storage; easiest to test.
-- **data/:** Swap local DB or add sync without touching domain logic.
+- **features/access:** Keeps passcode gate isolated and testable; integrates via a single access provider.
+- **features/pwa:** Separates install UX and service worker concerns from app features.
+- **db/schema.ts:** Auth store changes are explicit and migrated alongside existing Dexie schema.
 
 ## Architectural Patterns
 
-### Pattern 1: Roast Session FSM + Event Log
+### Pattern 1: Client-Only Passcode Gate with Persisted Verifier
 
-**What:** Model the roast as an explicit state machine with an append-only event log; derive splits, times, and roast loss from events.
-**When to use:** Any time a timer has phase markers (first crack, dump, cooling) and needs auditability.
-**Trade-offs:** Slightly more modeling work up front; much easier to correct or replay sessions.
-
-**Example:**
-```typescript
-type RoastEvent =
-  | { type: "START"; t: number }
-  | { type: "FIRST_CRACK"; t: number }
-  | { type: "DUMP"; t: number }
-  | { type: "COOL_END"; t: number }
-  | { type: "STOP"; t: number };
-
-function deriveSplits(events: RoastEvent[]) {
-  const start = events.find(e => e.type === "START")?.t ?? 0;
-  const fc = events.find(e => e.type === "FIRST_CRACK")?.t ?? null;
-  const dump = events.find(e => e.type === "DUMP")?.t ?? null;
-  return {
-    total: dump != null ? dump - start : null,
-    dev: fc != null && dump != null ? dump - fc : null,
-  };
-}
-```
-
-### Pattern 2: Inventory Ledger (Append-Only)
-
-**What:** Track stock changes as ledger entries instead of updating a single quantity.
-**When to use:** Any time you need auditability (roast input/output weights, adjustments).
-**Trade-offs:** More rows; but supports corrections and reporting.
+**What:** Store a salted, derived verifier in IndexedDB; keep unlock state in memory/session storage only.
+**When to use:** Single-user, local-first apps that need a privacy gate (not strong security).
+**Trade-offs:** Protects casual access, but local data is still inspectable by a determined user.
 
 **Example:**
 ```typescript
-type LedgerEntry = {
-  coffeeId: string;
-  type: "GREEN_IN" | "ROAST_IN" | "ROAST_OUT" | "ADJUST";
-  grams: number;
-  at: number;
-};
+const verifier = await derivePasscodeVerifier(passcode, salt);
+await authTable.put({ id: "local", salt, verifier, kdf: "PBKDF2" });
+setSessionUnlocked(true);
+```
 
-function currentBalance(entries: LedgerEntry[]) {
-  return entries.reduce((sum, e) => sum + e.grams, 0);
+### Pattern 2: Minimal Service Worker for App-Shell Caching
+
+**What:** Register a service worker to cache static assets and app shell for offline startup.
+**When to use:** PWA installability and offline access for a local-first app.
+**Trade-offs:** Risk of stale assets if cache invalidation is too aggressive; keep it simple.
+
+**Example:**
+```typescript
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js");
 }
 ```
 
-### Pattern 3: Derived Read Models
+### Pattern 3: Install UX via Standard Manifest + Optional Prompt
 
-**What:** Precompute view models for logs and inventory summaries.
-**When to use:** List-heavy screens (roast history, inventory overview).
-**Trade-offs:** Requires recompute on change; keeps UI simple and fast.
+**What:** Provide `manifest.webmanifest` and icons; optionally surface install UI using `beforeinstallprompt`.
+**When to use:** If you need a custom install button, but note limited browser support.
+**Trade-offs:** Custom prompt is non-standard and browser-dependent.
 
 ## Data Flow
 
 ### Request Flow
 
 ```
-User taps "Start" or "First Crack"
+User opens app
     ↓
-Timer UI → Roast Session Engine → Event Log → Local DB
-    ↓                    ↓              ↓          ↓
-Live UI ← Derived Model ← Recompute ← Persist
+Access Provider → Auth Store (Dexie) → Gate Decision
+    ↓                          ↓
+Gate UI (unlock) ← Verify Passcode ← Crypto Utils
+    ↓
+App Shell renders
 ```
 
 ### State Management
 
 ```
-Local DB
+Auth Store (Dexie)
+  ↓ (read-once)
+Access State (in-memory/session)
   ↓ (subscribe)
-Derived View Models ← Domain Aggregates ← Actions/Events ← UI
+Gate UI / App Shell
 ```
 
 ### Key Data Flows
 
-1. **Roast session capture:** Timer UI emits events → session engine validates state transitions → event log persisted → derived splits and roast loss computed for display and log entry.
-2. **Inventory update:** Roast saved with green input and roasted output weights → inventory ledger entries appended → inventory totals recomputed per coffee.
-3. **Roast log review:** Roast list screen queries derived read model → user edits notes/roast level → metadata updates without changing event log.
-
-## Build Order (Dependency-Aware)
-
-1. **Domain models and unit conversions** (grams/lb, loss %) → needed by timer and inventory.
-2. **Roast Session Engine (FSM + event log)** → foundation for timer and roast logs.
-3. **Local persistence layer** (repositories for sessions, coffees, ledger) → required before logs/inventory are useful.
-4. **Timer UI** → uses session engine + persistence for live capture.
-5. **Roast Log UI** → reads derived models from saved sessions.
-6. **Inventory UI** → depends on ledger entries and roast saves.
-7. **Sync/Export** (optional) → depends on stable data schema.
+1. **Passcode setup:** User sets passcode → salt + PBKDF2 verifier created → auth record stored in Dexie → session unlocked.
+2. **Unlock:** User enters passcode → verifier derived → compare to stored verifier → session unlocked (sessionStorage or in-memory).
+3. **Lock:** User taps lock or app unloads → session flag cleared → gate shown on next load.
+4. **PWA install:** Manifest + service worker registered → browser shows install UI; optional custom install button listens for `beforeinstallprompt` (non-standard).
 
 ## Scaling Considerations
 
 | Scale | Architecture Adjustments |
 |-------|--------------------------|
-| 0-1k users | Local-first monolith; single DB; offline by default. |
-| 1k-100k users | Add background sync and conflict resolution; server-backed storage. |
-| 100k+ users | Multi-tenant backend, analytics pipeline, data partitioning by user. |
+| 0-1k users | Local-only auth store + minimal service worker; no backend required. |
+| 1k-100k users | If multi-user appears, move auth to server and add real sessions. |
+| 100k+ users | Dedicated auth service; enforce server-side access control. |
 
 ### Scaling Priorities
 
-1. **First bottleneck:** timer accuracy during app backgrounding; fix with monotonic time source + event log reconciliation.
-2. **Second bottleneck:** large roast history lists; fix with derived read models and pagination.
+1. **First bottleneck:** Stale service worker caches; add cache versioning and update flow.
+2. **Second bottleneck:** Auth model if multi-user emerges; introduce server verification.
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Timer UI directly writes aggregates
+### Anti-Pattern 1: Storing unlocked state in localStorage
 
-**What people do:** Update total time and splits in UI state without an event log.
-**Why it's wrong:** Hard to fix mistakes or recompute when edits occur.
-**Do this instead:** Record events and derive metrics from them.
+**What people do:** Persist an "unlocked" flag across browser restarts.
+**Why it's wrong:** Defeats the privacy gate and exposes data after a restart.
+**Do this instead:** Keep unlock state in memory or sessionStorage only.
 
-### Anti-Pattern 2: Inventory as single mutable quantity
+### Anti-Pattern 2: Treating passcode gate as strong security
 
-**What people do:** Overwrite current stock on each roast.
-**Why it's wrong:** No audit trail and loss % becomes inconsistent.
-**Do this instead:** Use ledger entries and compute balance from history.
+**What people do:** Market the gate as robust protection.
+**Why it's wrong:** Client-only storage can be inspected; it is a privacy screen only.
+**Do this instead:** Clearly position as a lightweight gate; use real auth if needed.
 
 ## Integration Points
 
@@ -198,21 +174,35 @@ Derived View Models ← Domain Aggregates ← Actions/Events ← UI
 
 | Service | Integration Pattern | Notes |
 |---------|---------------------|-------|
-| Cloud backup (optional) | Sync service with local-first reconciliation | Only needed if multi-device or export required. |
-| CSV export | On-demand file generation | Keep data schema stable before shipping. |
+| Web App Manifest | `<link rel="manifest">` in HTML head | Required for installability. |
+| Service Worker | `navigator.serviceWorker.register()` | Requires HTTPS or localhost. |
 
 ### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| Timer UI ↔ Roast Session Engine | Events/actions | Strict FSM prevents invalid phase ordering. |
-| Roast Session Engine ↔ Inventory Ledger | Domain call | Roast save triggers ledger append. |
-| Domain ↔ Data | Repository interface | Keep storage tech swappable. |
+| Root layout ↔ Access provider | Context + guard | Gate must run before app routes render. |
+| Access provider ↔ Dexie auth store | Repository access | Reads verifier, writes setup data. |
+| Access provider ↔ Crypto utilities | Direct function calls | Keep cryptography isolated. |
+| App shell ↔ PWA registration | Hook/effect | Register once on client. |
+
+## Build Order (Dependency-Aware)
+
+1. **Dexie auth schema + migration** → required before any gate logic.
+2. **Crypto utilities (PBKDF2 + digest)** → needed for setup + unlock.
+3. **Access provider + gate routes** → blocks app until unlocked.
+4. **Session unlock handling** (memory/sessionStorage) → avoid persistent unlocks.
+5. **Manifest + icons** → prerequisite for installability.
+6. **Service worker registration + cache** → enables offline PWA.
+7. **Optional install UI** → only after manifest + SW in place.
 
 ## Sources
 
-- No external sources accessible in this environment; architecture based on general domain patterns and standard app design practices (LOW confidence).
+- https://developer.mozilla.org/en-US/docs/Web/Manifest (web app manifest and installability requirements)
+- https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API (service worker lifecycle, secure contexts)
+- https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto (Web Crypto primitives and key handling)
+- https://developer.mozilla.org/en-US/docs/Web/API/BeforeInstallPromptEvent (custom install prompt is non-standard)
 
 ---
-*Architecture research for: coffee roasting timer + inventory app*
+*Architecture research for: private passcode gate + PWA install for Roast Timer*
 *Researched: 2026-02-12*

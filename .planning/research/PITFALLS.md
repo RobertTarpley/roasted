@@ -1,122 +1,103 @@
 # Pitfalls Research
 
-**Domain:** Coffee roasting timer + green coffee inventory app
+**Domain:** Private access passcode gate + installable PWA for a personal Next.js app
 **Researched:** 2026-02-12
-**Confidence:** LOW
+**Confidence:** MEDIUM
 
 ## Critical Pitfalls
 
-### Pitfall 1: Ambiguous roast events and phase boundaries
+### Pitfall 1: Passcode gate is only UI-deep (false sense of privacy)
 
 **What goes wrong:**
-Roast logs are inconsistent because first crack, drop/dump, and cooling start are captured differently between sessions, making phase timing and comparisons unreliable.
+Protected data is still retrievable because the passcode check only hides UI routes, while data endpoints, static JSON, or cached assets remain accessible.
 
 **Why it happens:**
-Developers treat phase changes as informal notes instead of explicit, timestamped events in a state machine.
+The gate is implemented as a client-only check (localStorage/session state) without server-side enforcement or cache controls, which is easy to bypass in devtools.
 
 **How to avoid:**
-Define a strict event model: charge/start, first crack start, drop/dump, cooling start, cooling end. Store each as a timestamp and derive phase durations from those timestamps.
+Define the threat model explicitly (casual privacy vs. real security). If security matters, enforce the gate in server middleware or route handlers and avoid shipping protected data without verification. If it is only a privacy screen, say so in the UX and documentation.
 
 **Warning signs:**
-Users ask to edit or clarify roast phases after the fact; phase durations do not sum to total roast time.
+Data endpoints respond without a passcode, or viewing the app source reveals protected content even when "locked."
 
 **Phase to address:**
-Phase 1 - Core timer and roast logging.
+Phase 1 - Passcode gate design and threat model.
 
 ---
 
-### Pitfall 2: Unit mismatch between inventory and roast inputs
+### Pitfall 2: Service worker caches protected pages/data
 
 **What goes wrong:**
-Inventory drifts because green coffee is tracked in pounds while roast inputs/outputs are recorded in grams, causing conversion errors and rounding loss.
+After install, the service worker serves protected content from cache even when the app is "locked," or when the passcode changes.
 
 **Why it happens:**
-Separate parts of the app use different canonical units without a shared conversion rule or rounding policy.
+Offline-first caching strategies store HTML/data responses without considering auth state; cache persists until explicitly cleared.
 
 **How to avoid:**
-Store all weights in a single canonical unit (grams) in the data model; convert only at the UI layer with fixed rounding rules and precision.
+Do not precache protected routes. Use runtime caching keyed by auth state, and clear relevant caches when the passcode changes or on logout. Prefer network-first for protected content.
 
 **Warning signs:**
-Inventory totals do not reconcile with physical stock; negative inventory appears after a few roasts.
+Lock screen appears but navigating back shows content; switching passcode does not invalidate cached pages.
 
 **Phase to address:**
-Phase 2 - Inventory modeling and linking roasts to coffees.
+Phase 3 - Service worker and cache policy hardening.
 
 ---
 
-### Pitfall 3: Roast loss percentage calculated from the wrong base
+### Pitfall 3: App not installable because manifest/HTTPS requirements are missed
 
 **What goes wrong:**
-Roast loss percent is inconsistent or misleading because it uses roasted weight as the denominator, or does not account for tare/container weight.
+The browser never shows install UI; Lighthouse flags missing required manifest members or HTTPS.
 
 **Why it happens:**
-The formula is not defined explicitly, and inputs are accepted without tare or measurement guidance.
+Manifest lacks required fields or required icons (192x192, 512x512), or the app is not served over HTTPS.
 
 **How to avoid:**
-Define roast loss as (green_weight - roasted_weight) / green_weight. Require or guide tare handling and show the formula inline when entering weights.
+Ship a valid web app manifest linked on every page, include required members (name/short_name, icons, start_url, display), and serve over HTTPS.
 
 **Warning signs:**
-Loss % varies wildly for the same coffee; users report negative or extremely high loss values.
+Install prompt never fires on Chromium browsers; DevTools application panel shows manifest errors.
 
 **Phase to address:**
-Phase 1 - Roast data capture and validation.
+Phase 2 - PWA manifest + HTTPS validation.
 
 ---
 
-### Pitfall 4: Inventory modeled only as a single total per coffee
+### Pitfall 4: Custom install UX breaks on iOS
 
 **What goes wrong:**
-Roasts cannot be traced to a specific purchase or lot, and inventory adjustments are hard to audit.
+An "Install" button does nothing on iOS, leaving users stuck.
 
 **Why it happens:**
-Inventory is simplified to one number per coffee without lot/bag context or adjustment history.
+`beforeinstallprompt` is not supported on iOS; install must be done via Share sheet instructions.
 
 **How to avoid:**
-Model green inventory as lots (purchase date, vendor, weight, price) and consume lots when a roast is logged. Record adjustments as explicit events.
+Detect iOS and show explicit "Add to Home Screen" instructions; only show the custom install button where the event is supported.
 
 **Warning signs:**
-Users cannot answer "which bag did I roast?" or "why did inventory drop?"
+iOS users report no install prompt even though Android/desktop works.
 
 **Phase to address:**
-Phase 2 - Inventory model and roast linkage.
+Phase 2 - PWA install UX.
 
 ---
 
-### Pitfall 5: Timer accuracy breaks in mobile background
+### Pitfall 5: Service worker fails to register or controls the wrong scope
 
 **What goes wrong:**
-Roast timers drift or pause when the web app is backgrounded or the screen locks, causing inaccurate phase timings.
+Offline and installability features silently fail because the service worker does not register or only controls a subpath.
 
 **Why it happens:**
-Mobile browsers throttle timers; developers rely on setInterval alone without persisting timestamps.
+The service worker file path is incorrect, scope is too narrow, or the app is not running on HTTPS.
 
 **How to avoid:**
-Persist start time and phase event timestamps; compute elapsed time from system time, not timer ticks. Provide a loud, manual "event" UI instead of relying on precise background timing.
+Register the service worker from the origin root, verify the scope, and confirm HTTPS in production. Keep the worker path and scope aligned.
 
 **Warning signs:**
-Elapsed time jumps forward or backward after unlocking the phone; users re-enter times manually.
+DevTools shows "No service worker" for the app scope; offline mode fails to load any assets.
 
 **Phase to address:**
-Phase 1 - Timer implementation and resilience.
-
----
-
-### Pitfall 6: Cooling phase treated as a note, not a timed phase
-
-**What goes wrong:**
-Cooling duration is missing or inconsistent, and roast logs cannot compare total process time across roasts.
-
-**Why it happens:**
-Cooling is optional in the UI, and there is no explicit "cooling start" event.
-
-**How to avoid:**
-Include cooling as a first-class phase with its own start/end timestamps and default prompts after drop.
-
-**Warning signs:**
-Most logs show roast end but no cooling duration; cooling is entered as free text.
-
-**Phase to address:**
-Phase 1 - Timer flow and event model.
+Phase 2 - Service worker wiring.
 
 ## Technical Debt Patterns
 
@@ -124,10 +105,10 @@ Shortcuts that seem reasonable but create long-term problems.
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Store weights as strings with units | Quick UI rendering | Parsing errors and unit drift | Never |
-| Hardcode phase names and order | Fast MVP | Cannot support custom phases or edits | MVP only, if phase editing planned |
-| Allow free-text weight fields | Faster data entry | Invalid numbers and broken analytics | Never |
-| Skip inventory adjustments log | Less UI | No audit trail or reconciliation | MVP only for single user, but add soon |
+| Store passcode in localStorage/plain text | Quick implementation | Passcode easily recovered; no real privacy | Never |
+| Gate only the UI routes (no data protection) | Fast passcode screen | Data still accessible via network/cache | Only if explicitly "casual privacy" |
+| Precache everything for offline | Simpler SW config | Stale or protected content served offline | Never for protected routes |
+| One manifest file linked only on the homepage | Less wiring | Non-home routes not installable | Never |
 
 ## Integration Gotchas
 
@@ -135,9 +116,9 @@ Common mistakes when connecting to external services.
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| CSV import/export | Inconsistent units or missing headers | Standardize columns in grams and include unit column |
-| Cloud backup (iCloud/Drive) | Silent failure or partial sync | Explicit export confirmation and versioned backups |
-| Device notifications | Assuming notifications fire in background | Provide manual timers and in-app alerts when foregrounded |
+| Web app manifest | Manifest requires credentials but link lacks `crossorigin="use-credentials"` | Add `crossorigin` when manifest needs credentials |
+| PWA install prompt | Assuming `beforeinstallprompt` works on iOS | Use platform-specific install guidance |
+| HTTPS hosting | Testing on `http://` or file URLs | Use HTTPS or `localhost` for PWA features |
 
 ## Performance Traps
 
@@ -145,9 +126,9 @@ Patterns that work at small scale but fail as usage grows.
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Loading all roasts at once | Slow list and search | Paginate and lazy load | 1,000+ roasts |
-| Rendering charts on every keystroke | Lag during note entry | Debounce and memoize | 200+ data points |
-| Inventory recompute on every edit | Sluggish UI | Incremental updates | 500+ inventory events |
+| Unbounded runtime caching | Cache grows without limit | Use cache versioning and eviction | 100+ sessions / months of use |
+| Precache large media/assets | Install/update is slow | Only precache app shell | >50 MB assets |
+| Network-first on all routes | Slow app start while offline | Use cache-first for static assets only | Intermittent connectivity |
 
 ## Security Mistakes
 
@@ -155,9 +136,9 @@ Domain-specific security issues beyond general web security.
 
 | Mistake | Risk | Prevention |
 |---------|------|------------|
-| Sharing export files without redaction | Accidental disclosure of vendor pricing and notes | Offer "safe export" without cost fields |
-| Storing backups unencrypted | Data exposure if device shared | Encrypt exports or require passcode |
-| Public share links for roast logs | Unintentional public data | Default to private and require explicit share |
+| Sending passcode over non-TLS | Passcode exposure | Enforce HTTPS for all auth-related pages |
+| Weak passcode policy (very short) | Easy guessing | Require reasonable length or passphrase |
+| No cache invalidation on passcode change | Old user can still access | Clear SW caches and reset auth state |
 
 ## UX Pitfalls
 
@@ -165,18 +146,18 @@ Common user experience mistakes in this domain.
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| Timer UI hides critical events | Missed first crack logging | Large, single-tap event buttons |
-| Weight entry expects grams everywhere | Confusion for inventory in pounds | Explicit unit toggle and auto conversion |
-| No quick edit for event timestamps | Users abandon logging | Allow post-roast edits with audit note |
+| Passcode prompt on every refresh | Annoying friction | Allow "remember me" with session timeout |
+| Install CTA shown when not eligible | Confusion and dead button | Only show CTA when installable or provide instructions |
+| "Locked" state with no recovery path | User gets stuck | Provide passcode reset flow (even if local) |
 
 ## "Looks Done But Isn't" Checklist
 
 Things that appear complete but are missing critical pieces.
 
-- [ ] **Roast log:** Has first crack and drop times and derived phase durations
-- [ ] **Roast loss:** Uses green weight as base and accounts for tare
-- [ ] **Inventory:** Lot-level tracking with adjustment history and roast linkage
-- [ ] **Timer:** Resilient to backgrounding with persisted timestamps
+- [ ] **Passcode gate:** Server or cache protection matches the privacy goal; not UI-only.
+- [ ] **Manifest:** Required members + 192/512 icons + linked on all routes.
+- [ ] **HTTPS:** Production deploy uses HTTPS; installability verified.
+- [ ] **Service worker:** Protected routes are not precached; cache clears on passcode change.
 
 ## Recovery Strategies
 
@@ -184,10 +165,9 @@ When pitfalls occur despite prevention, how to recover.
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Ambiguous phase events | MEDIUM | Add an edit mode to set missing events and re-derive phases |
-| Unit mismatch | MEDIUM | Normalize all stored weights to grams via one-time migration |
-| Wrong roast loss formula | LOW | Recalculate loss for all roasts using corrected formula |
-| Inventory drift | HIGH | Add a reconciliation flow with physical count and adjustment event |
+| UI-only passcode gate | MEDIUM | Add middleware/auth guard and move data fetch behind it |
+| Cached protected content | MEDIUM | Bump cache version and clear old caches on activate |
+| Missing installability | LOW | Fix manifest + icons; redeploy with HTTPS |
 
 ## Pitfall-to-Phase Mapping
 
@@ -195,19 +175,20 @@ How roadmap phases should address these pitfalls.
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Ambiguous roast events | Phase 1 | Phase durations sum to total and can be edited |
-| Unit mismatch | Phase 2 | Inventory totals match physical count after conversion |
-| Roast loss formula errors | Phase 1 | Loss % computed from green weight with visible formula |
-| Inventory modeled as total only | Phase 2 | Roasts reference specific lots and have adjustment logs |
-| Background timer drift | Phase 1 | Elapsed time stays accurate after lock/unlock tests |
-| Cooling not timed | Phase 1 | Cooling phase appears in every roast log |
+| UI-only passcode gate | Phase 1 | Data not accessible without passcode in network tab |
+| Cached protected content | Phase 3 | Lock screen persists even with offline/cache tests |
+| Missing manifest requirements | Phase 2 | DevTools shows no manifest errors |
+| iOS install UX failure | Phase 2 | iOS users can follow instructions to install |
+| Service worker scope errors | Phase 2 | SW controls full app scope in DevTools |
 
 ## Sources
 
-- https://en.wikipedia.org/wiki/Coffee_roasting (process overview, first crack concept, roast mass loss; MEDIUM confidence)
-- https://library.sweetmarias.com/coffee-roasting/ (roasting basics and terminology; LOW confidence)
-- Personal experience with timer and inventory tooling in small roasting workflows (LOW confidence)
+- https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable (installability requirements, HTTPS, required manifest members; HIGH confidence)
+- https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest (manifest members and deployment details; HIGH confidence)
+- https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers (service worker scope, caching, HTTPS requirement; HIGH confidence)
+- https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html (password handling and TLS guidance; MEDIUM confidence)
+- Passcode gate threat model notes based on local-app privacy patterns (LOW confidence)
 
 ---
-*Pitfalls research for: coffee roasting timer + green coffee inventory app*
+*Pitfalls research for: private access passcode gate + installable PWA in Next.js*
 *Researched: 2026-02-12*

@@ -1,144 +1,136 @@
 # Project Research Summary
 
 **Project:** Roast Timer
-**Domain:** Mobile-friendly coffee roast timer + green coffee inventory (single-user, iPhone-first)
+**Domain:** Private single-user PWA access for a Next.js app
 **Researched:** 2026-02-12
 **Confidence:** MEDIUM
 
 ## Executive Summary
 
-This project is a single-user, mobile-first roast timer and green coffee inventory tracker. The research points to a local-first web app with a strict roast event model, phase timing, and lot-level inventory tracking as the most practical MVP approach. Experts in this domain emphasize consistent event capture, phase splits, and weight-based metrics, with inventory tied to lots and roast sessions.
+This project is a private, single-user PWA experience layered onto an existing Next.js app. The research points to a lightweight local privacy gate (passcode + auto-lock) paired with standard PWA installability (manifest, icons, service worker) as the right fit for a personal tool. Experts build this by keeping the gate client-first but explicit about the threat model, and by using a minimal, well-scoped service worker so the app installs and launches offline without caching protected content incorrectly.
 
-The recommended approach is a Next.js + React + TypeScript app with Dexie (IndexedDB) as the source of truth, a roast session FSM with an append-only event log, and an inventory ledger model in grams. This keeps the timer accurate on mobile, preserves auditability, and avoids premature backend complexity while enabling offline use.
+Recommended approach: implement a passcode gate backed by a Dexie auth table and Web Crypto-derived verifier, keep unlock state in memory/session only, then add PWA installability with `app/manifest.ts` and Serwist for service worker management. Avoid heavy auth frameworks or cloud sync; they conflict with the personal, local-first goal. Use a minimal install UX that works on iOS (instructions) and avoids over-reliance on `beforeinstallprompt`.
 
-Key risks are inconsistent phase events, unit mismatch between inventory and roast inputs, and timer drift when the phone is backgrounded. Mitigation is to enforce explicit event timestamps, normalize weights to grams in the data model with strict conversions at the UI, and compute elapsed time from persisted timestamps rather than timer ticks.
+Key risks center on privacy and caching: a UI-only gate can mislead users about security, and a service worker can unintentionally cache protected content. Mitigate by clarifying the privacy model, keeping data behind gate checks, and using cache strategies that avoid precaching protected routes while invalidating caches on passcode changes.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack is optimized for a single-user, offline-first web app: Next.js + React + TypeScript with Tailwind for rapid mobile UI, Dexie for reliable IndexedDB persistence, and Zustand/Zod/date-fns for state, validation, and time formatting. This avoids unnecessary backend and aligns with the single-device, iPhone-first constraint. See `/.planning/research/STACK.md`.
+The stack is a lean Next.js App Router implementation with built-in manifest support, edge middleware for optional route gating, and Serwist for service worker generation. This combination delivers installability and offline launch without adopting heavy auth providers or outdated PWA tooling.
 
 **Core technologies:**
-- Next.js 16.1.6: web app framework — strong App Router and deployment tooling; suited for mobile-first app without backend.
-- React 19.2.4: UI rendering — default ecosystem for modern web UIs.
-- TypeScript 5.9.3: type safety — prevents data-shape errors in roast and inventory calculations.
-- Tailwind CSS 4.1.18: styling — fast iteration for touch-first layouts.
-- Dexie 4.3.0 (IndexedDB): local-first persistence — reliable offline storage without server dependencies.
+- Next.js App Router manifest (16.1.6): installable PWA metadata via `app/manifest.ts` — built-in support, no extra packages.
+- Next.js Proxy (middleware) (16.1.6): edge passcode gate using cookies/redirects — blocks routes before render when needed.
+- `@serwist/next` (9.5.5): service worker generation and caching — maintained Next.js PWA integration.
 
 ### Expected Features
 
-Users expect a roast timer with phase splits, event markers, roast logging, and a coffee catalog with inventory. Differentiators include auto-deduction, comparisons, and simple planning tools once the core workflow is stable. See `/.planning/research/FEATURES.md`.
+The MVP is a privacy-gated installable PWA with offline launch. Users expect installability, offline start, and a passcode gate with auto-lock; these are the table stakes. Competitive additions include client-side encryption and encrypted export/import, but those should follow validation.
 
 **Must have (table stakes):**
-- Roast timer with phase splits and event markers — core workflow.
-- Roast log with notes, roast level, start/end weights, loss % — essential roast record.
-- Coffee catalog + lot selection with green inventory tracking — ties roasts to stock.
+- Installable PWA shell (manifest, icons, standalone display) — required for add-to-home.
+- Service worker caching for offline launch — required for offline startup.
+- Passcode gate + auto-lock — required for basic privacy expectations.
 
 **Should have (competitive):**
-- Inventory auto-deduction per roast — reduces manual stock math.
-- Roast comparison view (phase times + loss %) — supports iteration.
+- Client-side encryption for stored data — stronger privacy posture.
+- Encrypted export/import — safe migration without accounts.
 
 **Defer (v2+):**
-- Batch yield planner — needs historical loss data.
-- Low-inventory alerts — helpful but not critical for MVP.
+- Passcode rotation + rekey — high complexity.
+- Optional biometric unlock shortcut — platform-specific complexity.
 
 ### Architecture Approach
 
-A layered architecture with a roast session FSM + event log, an append-only inventory ledger, and derived read models is recommended to keep the UI simple while preserving auditability and accurate phase timings. See `/.planning/research/ARCHITECTURE.md`.
+The architecture centers on an access gate layer that wraps the app shell, backed by a Dexie auth store and Web Crypto utilities, with PWA registration and minimal service worker caching. The design keeps unlock state ephemeral (memory/session) while persisting only a derived verifier and salt in IndexedDB.
 
 **Major components:**
-1. Roast Session Engine (FSM + event log) — single source of truth for phase events and derived metrics.
-2. Inventory Ledger — append-only stock changes and unit conversions.
-3. Local DB + repositories — persistence of sessions, coffees, and ledger entries.
+1. Access Gate UI — passcode setup, unlock, lock, error states.
+2. Access Control Service — gate state, verification, session unlock/lock.
+3. Crypto Utilities — PBKDF2 + digest verifier generation.
+4. PWA Registration + Install UI — manifest linking, SW registration, install prompts.
+5. Dexie Auth Store — passcode verifier/salt persistence.
 
 ### Critical Pitfalls
 
-Top issues are event ambiguity, unit mismatch, and mobile timer drift, all of which can be avoided with strict event modeling, canonical units, and timestamp-based elapsed time. See `/.planning/research/PITFALLS.md`.
-
-1. **Ambiguous roast events and phase boundaries** — enforce explicit, timestamped events in a strict FSM.
-2. **Unit mismatch between inventory and roast inputs** — store all weights in grams; convert only at the UI.
-3. **Timer accuracy breaks in mobile background** — persist timestamps and compute elapsed time from system time.
-4. **Inventory modeled as a single total** — use lot-level inventory with adjustment events.
-5. **Wrong roast loss formula** — define loss as (green - roasted) / green and show formula in UI.
+1. **UI-only passcode gate** — define the threat model and avoid exposing protected data without checks.
+2. **Service worker caching protected content** — avoid precaching protected routes, clear caches on passcode change.
+3. **Missing manifest/HTTPS requirements** — ensure required manifest members and HTTPS to allow installability.
+4. **iOS install UX failure** — provide add-to-home instructions, do not rely solely on `beforeinstallprompt`.
+5. **Service worker scope errors** — register from origin root and verify control scope in DevTools.
 
 ## Implications for Roadmap
 
 Based on research, suggested phase structure:
 
-### Phase 1: Core Roast Capture
-**Rationale:** Event modeling and timer accuracy underpin every downstream feature and must be correct first.
-**Delivers:** Roast session FSM + event log, phase splits, timer UI resilient to backgrounding, roast log with weights and loss %.
-**Addresses:** Roast timer, event markers, roast log, start/end weights, loss %.
-**Avoids:** Ambiguous events, wrong loss formula, background timer drift, missing cooling phase.
+### Phase 1: Access Gate Foundation
+**Rationale:** Gate and data model must exist before any protected routes or UX can be trusted.
+**Delivers:** Dexie auth schema, Web Crypto verifier, passcode setup/unlock UI, session-based lock/auto-lock.
+**Addresses:** Passcode gate + auto-lock (table stakes).
+**Avoids:** UI-only passcode gate by aligning data access with gate state and documenting the privacy model.
 
-### Phase 2: Inventory + Lots
-**Rationale:** Inventory features depend on stable roast data and unit normalization.
-**Delivers:** Coffee catalog with lots, inventory ledger, unit conversions in grams, roast-to-lot linkage, manual adjustments.
-**Addresses:** Coffee catalog, green inventory tracking, lot selection.
-**Avoids:** Unit mismatch, inventory modeled as total only, inventory drift.
+### Phase 2: PWA Installability + Offline Launch
+**Rationale:** Installability and offline launch are the remaining P1 features and depend on manifest + service worker wiring.
+**Delivers:** Manifest + icons, service worker registration/caching, HTTPS validation, install UX with iOS guidance.
+**Uses:** Next.js manifest support, `@serwist/next`, minimal SW patterns.
+**Avoids:** Missing manifest requirements, SW scope errors, iOS install UX failure.
 
-### Phase 3: Optimization + Insights
-**Rationale:** Differentiators rely on accumulated history and stable schemas.
-**Delivers:** Inventory auto-deduction, roast comparison view, optional export scaffolding.
-**Addresses:** Auto-deduction, roast comparison; sets foundation for planner/alerts.
-**Avoids:** Premature complexity and unstable analytics from insufficient data.
+### Phase 3: Privacy Hardening + Migration
+**Rationale:** Encryption and export/import improve privacy and portability but depend on stable gate + storage.
+**Delivers:** Client-side encryption, encrypted export/import, cache invalidation on passcode changes.
+**Addresses:** Differentiators and cache-related pitfalls.
 
 ### Phase Ordering Rationale
 
-- Core event/timer correctness enables reliable phase metrics and roast loss, which inventory and comparisons depend on.
-- Architecture patterns (FSM + ledger + derived read models) align with phase boundaries for incremental delivery.
-- Early focus on unit normalization and event modeling mitigates the most expensive pitfalls.
+- Gate and auth data must be present before PWA caching to prevent protected data from being cached incorrectly.
+- Installability depends on manifest + service worker, which are simpler once access control is stable.
+- Encryption/export features depend on stable local storage and passcode workflows.
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 2:** Lot-level inventory and unit conversion UX details need validation with real workflow data.
-- **Phase 3:** Export formats and comparison semantics benefit from targeted research to avoid rework.
+- **Phase 3:** Client-side encryption and export/import flows require careful crypto and UX validation.
 
 Phases with standard patterns (skip research-phase):
-- **Phase 1:** Timer + event log + roast logging follow established local-first patterns.
+- **Phase 1:** Passcode gate with local verifier and session unlock is a well-known pattern.
+- **Phase 2:** PWA installability and basic offline caching are well-documented.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | MEDIUM | Official release sources validate versions; app suitability inferred from constraints. |
-| Features | MEDIUM | Competitive analysis from reputable product docs but limited user validation. |
-| Architecture | LOW | Based on standard patterns without direct external sources. |
-| Pitfalls | LOW | Mix of general roasting sources and practitioner inference. |
+| Stack | MEDIUM | Official Next.js/Serwist docs are strong; version compatibility still needs validation in project context. |
+| Features | MEDIUM | Derived from PWA best practices and local-first expectations; needs user validation. |
+| Architecture | MEDIUM | Standard patterns are clear, but implementation details depend on existing app structure. |
+| Pitfalls | MEDIUM | Mostly grounded in official guidance; threat-modeling is partly inferred. |
 
 **Overall confidence:** MEDIUM
 
 ### Gaps to Address
 
-- Inventory workflow validation: confirm lot-level model and adjustment UI against real roast practices before Phase 2.
-- Mobile timer behavior: validate backgrounding behavior on iOS Safari and refine event capture UX if needed.
-- Export/backup expectations: confirm whether CSV or file-based backup is required before Phase 3.
+- Threat model clarity: confirm whether the gate is a privacy screen or must block data endpoints; update UX accordingly.
+- Service worker cache policy: define exact caching rules for protected routes and passcode-change invalidation.
+- iOS install guidance: validate the final UX on Safari/iOS devices.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- https://github.com/vercel/next.js/releases/tag/v16.1.6 — Next.js release
-- https://github.com/facebook/react/releases/tag/v19.2.4 — React release
-- https://github.com/microsoft/TypeScript/releases/tag/v5.9.3 — TypeScript release
-- https://github.com/tailwindlabs/tailwindcss/releases/tag/v4.1.18 — Tailwind release
-- https://github.com/dexie/Dexie.js/releases/tag/v4.3.0 — Dexie release
-- https://github.com/pmndrs/zustand/releases/tag/v5.0.11 — Zustand release
-- https://github.com/colinhacks/zod/releases/tag/v4.3.6 — Zod release
-- https://github.com/date-fns/date-fns/releases/tag/v4.1.0 — date-fns release
-- https://tailwindcss.com/docs/installation/framework-guides/nextjs — Tailwind + Next.js guide
+- https://nextjs.org/docs/app/building-your-application/deploying/progressive-web-apps — manifest support, installability
+- https://nextjs.org/docs/app/building-your-application/routing/middleware — gate enforcement with middleware
+- https://serwist.pages.dev/docs/next — Serwist Next.js integration
+- https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps — PWA best practices
+- https://developer.mozilla.org/en-US/docs/Web/Manifest — manifest requirements
+- https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API — SW lifecycle and HTTPS requirements
+- https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API — cryptography primitives
 
 ### Secondary (MEDIUM confidence)
-- https://www.cropster.com/products/roast/features/ — roast workflow expectations
-- https://www.cropster.com/products/commerce/ — inventory planning patterns
-- https://www.cropster.com/products/origin/features/ — lot/inventory concepts
-- https://artisan-scope.org/ — roasting software landscape
+- https://www.npmjs.com/package/@serwist/next — version recency
+- https://www.npmjs.com/package/serwist — version recency
+- https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html — passcode handling guidance
 
 ### Tertiary (LOW confidence)
-- https://en.wikipedia.org/wiki/Coffee_roasting — process overview
-- https://library.sweetmarias.com/coffee-roasting/ — roasting terminology
-- Practitioner experience — timer/inventory workflow patterns
+- Passcode threat model notes inferred from local-only privacy patterns; validate with user expectations.
 
 ---
 *Research completed: 2026-02-12*

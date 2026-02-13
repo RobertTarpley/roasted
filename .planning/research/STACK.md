@@ -1,6 +1,6 @@
 # Stack Research
 
-**Domain:** Mobile-friendly roast timer + green coffee inventory web app (single-user, iPhone-first)
+**Domain:** Private single-user PWA access in a Next.js app
 **Researched:** 2026-02-12
 **Confidence:** MEDIUM
 
@@ -10,85 +10,80 @@
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| Next.js | 16.1.6 | Web app framework (routing, bundling, deployment) | Standard 2025 React web stack with a mature App Router and strong deployment tooling; fits a single-user, mobile-first app without needing a backend. (Confidence: HIGH) |
-| React | 19.2.4 | UI rendering and component model | Default UI layer for modern web apps and the foundation for Next.js; strongest ecosystem for mobile-friendly web UI. (Confidence: HIGH) |
-| TypeScript | 5.9.3 | Type safety and maintainability | Prevents data-shape bugs in roast/weight calculations and keeps inventory data consistent. (Confidence: HIGH) |
-| Tailwind CSS | 4.1.18 | Styling system for mobile UI | Fast iteration for touch-first layouts and consistent spacing/typography without custom CSS sprawl. (Confidence: HIGH) |
-| Dexie (IndexedDB) | 4.3.0 | Local-first persistence | Reliable offline storage for roasts and inventory without server dependencies. (Confidence: HIGH) |
+| Next.js App Router manifest (built-in) | 16.1.6 | Installable PWA metadata via `app/manifest.ts` | Next.js supports the web app manifest file convention directly, so you can add installability without extra packages. |
+| Next.js Proxy (middleware renamed) | 16.1.6 | Passcode gate at the edge using cookies and redirects | Lets you block app routes until an unlock cookie is present, without adding an auth framework. |
+| @serwist/next | 9.5.5 | Service worker generation and caching for offline-capable PWA | Actively maintained Next.js PWA integration for service workers and caching strategies. |
 
 ### Supporting Libraries
 
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| Zustand | 5.0.11 | App state store | Use for cross-component timer state, roast phase transitions, and UI state that shouldn't live in local component state. (Confidence: HIGH) |
-| Zod | 4.3.6 | Data validation | Use for validating roast entries, weights, and inventory inputs before persistence. (Confidence: HIGH) |
-| date-fns | 4.1.0 | Date/time utilities | Use for elapsed time formatting and phase duration calculations. (Confidence: HIGH) |
+| serwist | 9.5.5 | Service worker runtime APIs and caching strategies | Use when you need custom caching strategies beyond @serwist/next defaults. |
+| Web Crypto API (built-in) | Baseline (2015+) | Passcode hashing/key derivation in the browser | Use to store a hashed passcode (not plaintext) for a local-only gate. |
 
 ### Development Tools
 
 | Tool | Purpose | Notes |
 |------|---------|-------|
-| ESLint | Linting | Use Next.js recommended config to keep rules aligned with framework defaults. |
-| Prettier | Formatting | Keeps formatting consistent across contributors and UI code. |
+| Lighthouse (Chrome DevTools) | Validate installability and PWA checks | Run after adding manifest and service worker to confirm install criteria. |
 
 ## Installation
 
 ```bash
 # Core
-npm install next@16.1.6 react@19.2.4 react-dom@19.2.4 tailwindcss@4.1.18 dexie@4.3.0
+npm install @serwist/next serwist
 
 # Supporting
-npm install zustand@5.0.11 zod@4.3.6 date-fns@4.1.0
+# (none)
 
 # Dev dependencies
-npm install -D typescript@5.9.3 eslint prettier
+# (none)
 ```
 
 ## Alternatives Considered
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| Next.js | Vite + React | Use for a pure SPA with static hosting and zero SSR needs; simpler build if you do not want Next.js routing or server features. |
-| Dexie (IndexedDB) | SQLite (OPFS/wasm) | Use if you need relational queries, huge datasets, or complex reporting beyond IndexedDB’s strengths. |
-| Zustand | Redux Toolkit | Use if you need advanced debugging, strict state conventions, or large team workflows. |
+| @serwist/next | Manual service worker (`public/sw.js`) | Use if you want full control and are willing to maintain caching logic yourself. |
+| @serwist/next | next-pwa | Use only if you are already on next-pwa and cannot migrate; it is not actively updated. |
+| Proxy-based passcode gate | Client-only gate (no proxy) | Use if you only need a soft privacy screen and want zero server involvement. |
 
 ## What NOT to Use
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| localStorage for core data | Blocking API, small quotas, and no indexing make it unreliable for inventory/roast history. | Dexie (IndexedDB) |
-| Firebase/Firestore for single-user local-first MVP | Adds auth/billing complexity and offline behavior is harder to reason about for a single-user app. | Dexie now; add a sync backend later if multi-device sync is required |
-| Cordova/Ionic wrappers | Extra native build surface and UI constraints without clear value for a web-first timer/inventory tool. | Next.js mobile web app (optionally PWA) |
+| next-pwa | Last published years ago; risk of incompatibility with recent Next.js versions | @serwist/next |
+| Full auth providers (NextAuth/Auth.js) | Overkill for single-user private access; adds DB/session complexity | Proxy + local passcode hash stored in Dexie |
 
 ## Stack Patterns by Variant
 
-**If you want a zero-backend, offline-first MVP:**
-- Use the stack above with Dexie as the source of truth
-- Because local-first removes auth/sync complexity and matches the single-user requirement
+**If you need a simple privacy screen (single device, offline OK):**
+- Use a client-only passcode gate backed by Dexie + Web Crypto API
+- Because the goal is “keep casual access out,” not enforce real authentication
 
-**If you later need multi-device sync:**
-- Keep Dexie as a client cache and add a hosted Postgres + auth backend (e.g., Supabase)
-- Because syncing inventory/roast history requires conflict resolution and user identity
+**If you want route-level blocking (protects deep links):**
+- Use Next.js Proxy with a cookie check + unlock route
+- Because Proxy runs before routes are rendered and can block access uniformly
+
+**If you only need installability (not offline):**
+- Use manifest + icons only, skip service worker tooling
+- Because install prompts do not require offline caching
 
 ## Version Compatibility
 
 | Package A | Compatible With | Notes |
 |-----------|-----------------|-------|
-| next@16.1.6 | react@19.2.4, react-dom@19.2.4 | Verify peer dependency warnings on install and align versions with Next.js release notes. |
-| tailwindcss@4.1.18 | @tailwindcss/postcss, postcss | Follow the Tailwind Next.js install guide for the PostCSS plugin setup. |
+| @serwist/next@9.5.5 | Next.js 16.x | Verify Turbopack vs webpack mode; @serwist/next has specific guidance for each. |
 
 ## Sources
 
-- https://github.com/vercel/next.js/releases/tag/v16.1.6 — latest stable release
-- https://github.com/facebook/react/releases/tag/v19.2.4 — latest stable release
-- https://github.com/microsoft/TypeScript/releases/tag/v5.9.3 — latest stable release
-- https://github.com/tailwindlabs/tailwindcss/releases/tag/v4.1.18 — latest stable release
-- https://tailwindcss.com/docs/installation/framework-guides/nextjs — Tailwind + Next.js installation steps
-- https://github.com/dexie/Dexie.js/releases/tag/v4.3.0 — latest stable release
-- https://github.com/pmndrs/zustand/releases/tag/v5.0.11 — latest stable release
-- https://github.com/colinhacks/zod/releases/tag/v4.3.6 — latest stable release
-- https://github.com/date-fns/date-fns/releases/tag/v4.1.0 — latest stable release
+- https://nextjs.org/docs/app/building-your-application/deploying/progressive-web-apps — Next.js PWA manifest support, installability, and Serwist mention
+- https://nextjs.org/docs/app/building-your-application/routing/middleware — Proxy (middleware) for route gating and cookies
+- https://serwist.pages.dev/docs/next — @serwist/next integration docs
+- https://www.npmjs.com/package/@serwist/next — current version and release recency
+- https://www.npmjs.com/package/serwist — current version and release recency
+- https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API — Web Crypto API for passcode hashing (secure context)
 
 ---
-*Stack research for: Mobile-friendly roast timer + inventory app*
+*Stack research for: Private single-user PWA access in Next.js*
 *Researched: 2026-02-12*

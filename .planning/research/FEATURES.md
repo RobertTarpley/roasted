@@ -1,6 +1,6 @@
 # Feature Research
 
-**Domain:** Coffee roasting timer + green coffee inventory (single-user, iPhone-first)
+**Domain:** Private, single-user PWA access for a personal web app
 **Researched:** 2026-02-12
 **Confidence:** MEDIUM
 
@@ -12,14 +12,12 @@ Features users assume exist. Missing these = product feels incomplete.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Roast timer with phase splits (drying/maillard/development) | Roast software commonly shows phase timing and development windows | MEDIUM | Use a timer + manual phase markers aligned to first crack and drop; show phase % and times. Cropster includes modulation timer and auto-marking events. |
-| Event markers: first crack, color change, drop/end | Roast profiling tools record key events during a roast | LOW | Provide quick buttons and timestamps; keep editable for corrections. Cropster supports auto-mark events and roast curve notes. |
-| Roast log with notes and roast level | Roasters expect to capture roast notes tied to a batch | LOW | Free-text notes + roast level/target; keep lightweight. |
-| Start/end weights with roast loss % | Standard roast tracking includes weight loss | LOW | Input grams; compute loss %, retain green weight for inventory deduction. Cropster tracks pre/post-roast weights and weight loss. |
-| Coffee catalog + lot selection | Roasts are tied to a specific coffee/lot | MEDIUM | Coffee records include origin, process, lot name, bag size, and green weight. |
-| Green inventory tracking (weights, adjustments) | Inventory management is core to roasting operations | MEDIUM | Track pounds for stock, convert from gram roast inputs; adjust for deliveries/usage. Cropster highlights green inventory management and reporting. |
-| Roast history list + basic filters | Users need to find past roasts quickly | LOW | Filter by coffee/lot, date, roast level. |
-| Offline-first data capture | Roasting spaces often have spotty connectivity | MEDIUM | Local-first storage with background sync; Cropster highlights offline functionality for roasting intelligence. |
+| Installable PWA shell (manifest, icons, standalone display) | PWA users expect add-to-home and app-like launch | MEDIUM | Requires Web App Manifest, icons, start URL, and standalone display settings. | 
+| Service worker caching for offline launch | PWAs are expected to load without network | MEDIUM | Cache app shell and critical routes; keep cache versioning predictable. |
+| Secure context (HTTPS) | PWA + service worker require secure contexts | LOW | Must run on HTTPS (localhost allowed for dev). |
+| Passcode gate on launch | Private personal apps must keep data behind a lock | MEDIUM | Local passcode screen before entering app; store derived verifier locally. |
+| Auto-lock on background/idle | Users expect the app to relock when leaving | LOW | Lock on `visibilitychange`/`blur` and inactivity timeout. |
+| Local-first storage for private data | PWA data must persist offline | LOW | Store app data in IndexedDB (Dexie already used). |
 
 ### Differentiators (Competitive Advantage)
 
@@ -27,12 +25,10 @@ Features that set the product apart. Not required, but valuable.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Inventory auto-deduction per roast (gram -> pound conversions) | Removes manual stock math and keeps green inventory accurate | MEDIUM | Compute usage from roast weight + loss, convert units, update lot. Cropster auto-updates inventory from roasting. |
-| Quick-repeat roast templates | Reduces setup time for repeat batches | MEDIUM | Save default phase targets, events, and notes per coffee/lot. |
-| Roast comparison view (phase times + loss %) | Helps users iterate and dial in roasts | MEDIUM | Compare 2-3 roasts by phase timing and loss %, not full curves. Cropster supports roast compare reports. |
-| Low-inventory alerts per coffee | Prevents running out and supports planning | LOW | Thresholds in pounds; optional notifications. Cropster provides inventory level alerts. |
-| Batch yield planner (desired roasted output -> green input) | Simplifies production planning for small roasters | MEDIUM | Use loss % history to estimate required green weight. Cropster offers batch calculation tools and output planning. |
-| Photo capture of green/roast labels | Speeds manual labeling and visual recall | LOW | Attach photos to coffee and roast records. |
+| Client-side encryption for stored data | Strong privacy posture for sensitive logs | HIGH | Use Web Crypto to derive a key from passcode and encrypt IndexedDB payloads. |
+| Optional “private mode” networking toggle | Ensures no outbound calls while locked or offline | MEDIUM | Block sync/analytics when locked; align with personal privacy expectations. |
+| Secure passcode change + data rekey | Lets users rotate passcode without data loss | HIGH | Requires re-encrypting data with new key. |
+| Encrypted export/backup file | Allows safe device migration without server accounts | MEDIUM | Export encrypted JSON/zip; import requires passcode. |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
@@ -40,36 +36,37 @@ Features that seem good but create problems.
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Hardware integration for real-time temperature curves | Perceived as "pro" roasting software | High device variability, setup/support burden for single-user app | Manual timers + event markers; keep space for future integrations. |
-| Multi-user roles and permissions | Teams want shared access | Adds complexity for a single-user tool and iPhone-first UX | Single-account with optional export/share of roast logs. |
-| Full e-commerce order and fulfillment management | Some products bundle it (e.g., production + order mgmt) | Scope creep and domain mismatch for a timer/inventory tool | Keep inventory per coffee and export data; integrate later if needed. |
-| Enterprise-grade traceability and compliance audits | Seen in large roastery platforms | Complex workflows, low value for single-user MVP | Simple lot history and notes; avoid compliance features. |
+| Full account system + password reset emails | Feels “properly secure” | Adds backend complexity and weakens the “private local” story | Keep local passcode; add export/backup instead. |
+| Always-on cloud sync | Convenience across devices | Adds data exposure and conflict handling | Optional manual export/import. |
+| Biometric-only unlock with no fallback | Users want Face ID/Touch ID | Locks users out when OS biometrics change or fail | Offer biometrics only as an optional shortcut alongside passcode. |
 
 ## Feature Dependencies
 
 ```
-Roast Timer
-    └──requires──> Coffee Catalog / Lots
-                   └──requires──> Inventory Tracking (green weight per lot)
+Installable PWA Shell
+    └──requires──> Web App Manifest + Icons
+    └──requires──> Service Worker Registration
 
-Roast Loss %
-    └──requires──> Start/End Weights
+Offline Launch
+    └──requires──> Service Worker Caching Strategy
 
-Inventory Auto-Deduction
-    └──requires──> Roast Loss % + Inventory Tracking
+Passcode Gate
+    └──requires──> Local Credential Storage (verifier)
+    └──requires──> Secure Context (HTTPS)
 
-Batch Yield Planner
-    └──requires──> Roast Loss % History
+Client-side Encryption
+    └──requires──> Web Crypto API
+    └──requires──> IndexedDB Storage (Dexie)
 
-Roast Comparison
-    └──requires──> Roast History + Phase Split Data
+Encrypted Export/Import
+    └──requires──> Client-side Encryption
 ```
 
 ### Dependency Notes
 
-- **Roast Timer requires Coffee Catalog/Lots:** Each roast must link to a specific coffee to keep notes and inventory consistent.
-- **Inventory Auto-Deduction requires Roast Loss % + Inventory Tracking:** Deducting green weight needs accurate usage and unit conversion.
-- **Batch Yield Planner requires Roast Loss % History:** Estimates depend on historical loss for the same coffee/lot.
+- **Installable PWA shell requires manifest + service worker:** Installability depends on manifest metadata and service worker presence.
+- **Passcode gate requires local credential storage:** Needs a stored verifier or derived key to validate unlock attempts.
+- **Client-side encryption requires Web Crypto + IndexedDB:** Encryption key handling and data storage are tightly coupled.
 
 ## MVP Definition
 
@@ -77,35 +74,35 @@ Roast Comparison
 
 Minimum viable product — what's needed to validate the concept.
 
-- [ ] Roast timer with phase splits and event markers — core roasting workflow.
-- [ ] Roast log with notes, roast level, start/end weights, loss % — captures the essential roast record.
-- [ ] Coffee catalog + green inventory in pounds, roast weights in grams — ties roasts to lots and tracks stock.
+- [ ] Installable PWA shell (manifest, icons, standalone) — enables home-screen install and app-like launch.
+- [ ] Service worker caching for offline launch — ensures the app opens without network.
+- [ ] Passcode gate + auto-lock — delivers basic privacy for a single-user app.
 
 ### Add After Validation (v1.x)
 
 Features to add once core is working.
 
-- [ ] Inventory auto-deduction per roast — remove manual stock adjustments.
-- [ ] Roast comparison view — supports iterative dialing in.
+- [ ] Client-side encryption for stored data — improves privacy posture.
+- [ ] Encrypted export/import — supports migration without accounts.
 
 ### Future Consideration (v2+)
 
 Features to defer until product-market fit is established.
 
-- [ ] Batch yield planner — depends on enough historical data.
-- [ ] Low-inventory alerts — valuable but not critical for MVP.
+- [ ] Passcode rotation + rekey workflow — higher complexity, lower immediate impact.
+- [ ] Optional biometric unlock shortcut — platform-specific testing and fallback requirements.
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Roast timer + phase splits + events | HIGH | MEDIUM | P1 |
-| Roast log + notes + roast level + weights | HIGH | LOW | P1 |
-| Coffee catalog + inventory | HIGH | MEDIUM | P1 |
-| Inventory auto-deduction | HIGH | MEDIUM | P2 |
-| Roast comparison view | MEDIUM | MEDIUM | P2 |
-| Batch yield planner | MEDIUM | MEDIUM | P3 |
-| Low-inventory alerts | MEDIUM | LOW | P3 |
+| Installable PWA shell (manifest + icons) | HIGH | MEDIUM | P1 |
+| Service worker caching for offline launch | HIGH | MEDIUM | P1 |
+| Passcode gate + auto-lock | HIGH | MEDIUM | P1 |
+| Client-side encryption for stored data | MEDIUM | HIGH | P2 |
+| Encrypted export/import | MEDIUM | MEDIUM | P2 |
+| Passcode rotation + rekey | LOW | HIGH | P3 |
+| Optional biometric unlock shortcut | LOW | MEDIUM | P3 |
 
 **Priority key:**
 - P1: Must have for launch
@@ -116,17 +113,16 @@ Features to defer until product-market fit is established.
 
 | Feature | Competitor A | Competitor B | Our Approach |
 |---------|--------------|--------------|--------------|
-| Roast profiling with event markers | Cropster Roast: real-time data, roast profiling, auto-mark events | Artisan: roasting software with automation and device support | Manual timer + event markers optimized for mobile use. |
-| Inventory management | Cropster Roast/Origin: green inventory management, lot tracking | Cropster Commerce: inventory planning and traceability | Lightweight per-lot inventory with gram/pound conversions. |
-| Roast comparison/analysis | Cropster: roast compare reports and profile analysis | Artisan: replay/automation focus | Simple phase-time and loss % comparisons. |
+| Installability + offline launch | Not assessed | Not assessed | Follow PWA best practices with manifest + service worker. |
+| Local privacy gating | Not assessed | Not assessed | Passcode gate + auto-lock, optional encryption later. |
 
 ## Sources
 
-- https://www.cropster.com/products/roast/features/ (roast profiling, event markers, weights, inventory integration)
-- https://www.cropster.com/products/commerce/ (inventory planning, traceability)
-- https://www.cropster.com/products/origin/features/ (inventory management capabilities)
-- https://artisan-scope.org/ (roasting software ecosystem)
+- https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps (PWA installability, offline, best practices)
+- https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest (manifest requirements for installable PWAs)
+- https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API (service worker offline caching)
+- https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API (client-side cryptography primitives)
 
 ---
-*Feature research for: coffee roasting timer + green coffee inventory*
+*Feature research for: private personal PWA access*
 *Researched: 2026-02-12*
