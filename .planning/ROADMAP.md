@@ -2,7 +2,7 @@
 
 ## Overview
 
-This roadmap delivers a mobile-friendly roast timer and logging workflow first, then adds lot-level inventory tracking tied to roasts, and finally introduces roast comparison for iterative improvement. Phases are organized around user-visible capabilities so each milestone is usable on its own.
+This milestone makes the app privately accessible and installable as a PWA for personal use. First deliver the passcode gate and privacy notice, then enable installability with offline app-shell support and iOS add-to-home guidance.
 
 ## Phases
 
@@ -12,66 +12,44 @@ This roadmap delivers a mobile-friendly roast timer and logging workflow first, 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: Roast Capture + Logs** - Time roasts with phase splits and save core roast records
-- [ ] **Phase 2: Inventory + History** - Manage lots/inventory and connect roasts to inventory-aware history
-- [ ] **Phase 3: Roast Comparison** - Compare roasts by phase timing and yield
+- [ ] **Phase 4: Private Access Gate** - Passcode gate with session lock and privacy notice
+- [ ] **Phase 5: PWA Install + Offline Shell** - Installable PWA with offline launch and iOS guidance
 
 ## Phase Details
 
-### Phase 1: Roast Capture + Logs
-**Goal**: Users can time a roast with phase splits and save complete roast records
-**Depends on**: Nothing (first phase)
-**Requirements**: TIME-01, TIME-02, TIME-03, TIME-04, TIME-05, LOG-01, LOG-02, LOG-03
+### Phase 4: Private Access Gate
+**Goal**: Users can privately access the app behind a passcode gate
+**Depends on**: Phase 3
+**Requirements**: ACCESS-01, ACCESS-02, ACCESS-03, PRIV-01
 **Success Criteria** (what must be TRUE):
-  1. User can start a roast timer and see overall elapsed time
-  2. User can mark First Crack and Drop/Bean Dump and see development and cooling times derived from those events
-  3. User can add or remove First Crack and Drop markers with timestamps during a roast (delete and re-add only; no direct edit)
-  4. User can stop a roast and save notes, roast level, weights in grams, and a calculated roast yield %
-**Plans**: 4 plans
+  1. User sees a passcode prompt before any app content is shown
+  2. User can unlock with the current passcode, and the unlock persists for the session until they lock
+  3. Changing the server-configured passcode causes the previous passcode to fail on next unlock
+  4. User sees a brief privacy notice explaining the passcode is a personal gate
+**Plans**: TBD
 
 Plans:
-- [x] 01-01-PLAN.md — Scaffold app, domain model, and persistence layer
-- [x] 01-02-PLAN.md — Build timer UI, controls, and event markers
-- [x] 01-03-PLAN.md — Add roast log save flow and history delete
-- [x] 01-04-PLAN.md — Gap fixes for live splits, mobile layout, and yield %
+- [ ] 04-01: Passcode gate flow, session lock, and privacy notice
 
-### Phase 2: Inventory + History
-**Goal**: Users can manage green coffee lots and see inventory-aware roast history
-**Depends on**: Phase 1
-**Requirements**: LOG-04, INVT-01, INVT-02, INVT-03, INVT-04
+### Phase 5: PWA Install + Offline Shell
+**Goal**: Users can install and launch the app as a private PWA
+**Depends on**: Phase 4
+**Requirements**: PWA-01, PWA-02, PWA-03
 **Success Criteria** (what must be TRUE):
-  1. User can create coffee lots and set inventory in pounds
-  2. User can adjust lot inventory for purchases or corrections
-  3. User can select a lot for each roast and see it associated in history
-  4. Inventory auto-deducts using the roast green weight with gram-to-pound conversion
-  5. User can filter roast history by coffee/lot, date, and roast level
-**Plans**: 3 plans
+  1. User can install the app on iPhone and desktop with correct name/icon and standalone launch
+  2. App launches to a cached shell when offline
+  3. User can view iOS Add to Home Screen guidance from within the app
+**Plans**: TBD
 
 Plans:
-- [x] 02-01-PLAN.md — Add inventory persistence and roast linkage foundations
-- [x] 02-02-PLAN.md — Build inventory management UI for coffees, lots, and adjustments
-- [x] 02-03-PLAN.md — Connect roasts to lots and add history filters
-
-### Phase 3: Roast Comparison
-**Goal**: Users can compare roasts to improve consistency
-**Depends on**: Phase 2
-**Requirements**: INS-01
-**Success Criteria** (what must be TRUE):
-  1. User can select 2-3 roasts to compare
-  2. Comparison shows phase times and yield % for each selected roast
-  3. Changing the selection updates the comparison view
-**Plans**: 1 plan
-
-Plans:
-- [ ] 03-01-PLAN.md — Add roast comparison screen with selection and metrics
+- [ ] 05-01: Manifest/icons, service worker offline shell, and iOS install guidance
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 1.1 → 1.2 → 2 → 2.1 → 2.2 → 3
+Phases execute in numeric order: 4 → 4.1 → 4.2 → 5 → 5.1 → 5.2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Roast Capture + Logs | 4/4 | Complete | 2026-02-12 |
-| 2. Inventory + History | 2/3 | In progress | - |
-| 3. Roast Comparison | 0/TBD | Not started | - |
+| 4. Private Access Gate | 0/TBD | Not started | - |
+| 5. PWA Install + Offline Shell | 0/TBD | Not started | - |

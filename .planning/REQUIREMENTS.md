@@ -53,18 +53,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ACCESS-01 | Phase TBD | Pending |
-| ACCESS-02 | Phase TBD | Pending |
-| ACCESS-03 | Phase TBD | Pending |
-| PWA-01 | Phase TBD | Pending |
-| PWA-02 | Phase TBD | Pending |
-| PWA-03 | Phase TBD | Pending |
-| PRIV-01 | Phase TBD | Pending |
+| ACCESS-01 | Phase 4 | Pending |
+| ACCESS-02 | Phase 4 | Pending |
+| ACCESS-03 | Phase 4 | Pending |
+| PWA-01 | Phase 5 | Pending |
+| PWA-02 | Phase 5 | Pending |
+| PWA-03 | Phase 5 | Pending |
+| PRIV-01 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 7 total
-- Mapped to phases: 0
-- Unmapped: 7 ⚠️
+- Mapped to phases: 7
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-13*
