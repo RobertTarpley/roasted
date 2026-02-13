@@ -40,10 +40,10 @@ Plans:
   1. User can install the app on iPhone and desktop with correct name/icon and standalone launch
   2. App launches to a cached shell when offline
   3. User can view iOS Add to Home Screen guidance from within the app
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 05-01: Manifest/icons, service worker offline shell, and iOS install guidance
+- [ ] 05-01-PLAN.md — PWA manifest, offline shell, and iOS install guidance
 
 ## Progress
 
@@ -53,4 +53,4 @@ Phases execute in numeric order: 4 → 4.1 → 4.2 → 5 → 5.1 → 5.2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 4. Private Access Gate | 2/2 | Complete | 2026-02-13 |
-| 5. PWA Install + Offline Shell | 0/TBD | Not started | - |
+| 5. PWA Install + Offline Shell | 0/1 | Not started | - |
