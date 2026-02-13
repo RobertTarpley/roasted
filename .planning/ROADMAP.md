@@ -26,10 +26,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can unlock with the current passcode, and the unlock persists for the session until they lock
   3. Changing the server-configured passcode causes the previous passcode to fail on next unlock
   4. User sees a brief privacy notice explaining the passcode is a personal gate
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: Passcode gate flow, session lock, and privacy notice
+- [ ] 04-01-PLAN.md — Passcode gate flow, session lock, and privacy notice
 
 ### Phase 5: PWA Install + Offline Shell
 **Goal**: Users can install and launch the app as a private PWA
