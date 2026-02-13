@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
 const ACCESS_COOKIE = "rt_unlocked";
 
 export async function POST(request: Request) {

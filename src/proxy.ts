@@ -4,8 +4,17 @@ import { NextResponse } from "next/server";
 const ACCESS_COOKIE = "rt_unlocked";
 const ACCESS_PATH = "/access";
 
-export function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname === ACCESS_PATH) {
+export default function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  const isIgnoredPath =
+    pathname === ACCESS_PATH ||
+    pathname === "/favicon.ico" ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_next/static") ||
+    pathname.startsWith("/_next/image");
+
+  if (isIgnoredPath) {
     return NextResponse.next();
   }
 
@@ -19,7 +28,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!access|api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/:path*"],
 };
