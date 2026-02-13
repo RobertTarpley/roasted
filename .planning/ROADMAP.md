@@ -12,7 +12,7 @@ This milestone makes the app privately accessible and installable as a PWA for p
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 4: Private Access Gate** - Passcode gate with session lock and privacy notice
+- [x] **Phase 4: Private Access Gate** - Passcode gate with session lock and privacy notice
 - [x] **Phase 5: PWA Install + Offline Shell** - Installable PWA with offline launch and iOS guidance
 
 ## Phase Details

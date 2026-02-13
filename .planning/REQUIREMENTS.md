@@ -9,19 +9,19 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Access Gate
 
-- [ ] **ACCESS-01**: User must enter a passcode before any app content is shown
-- [ ] **ACCESS-02**: Passcode is validated using a server-side env var (no client-visible secret)
-- [ ] **ACCESS-03**: Unlock persists for the browser session and re-locks on tab close
+- [x] **ACCESS-01**: User must enter a passcode before any app content is shown
+- [x] **ACCESS-02**: Passcode is validated using a server-side env var (no client-visible secret)
+- [x] **ACCESS-03**: Unlock persists for the browser session and re-locks on tab close
 
 ### PWA Install
 
-- [ ] **PWA-01**: App is installable as a PWA on iPhone and desktop (manifest + icons)
-- [ ] **PWA-02**: App loads offline to a cached app shell
-- [ ] **PWA-03**: App provides iOS Add to Home Screen guidance
+- [x] **PWA-01**: App is installable as a PWA on iPhone and desktop (manifest + icons)
+- [x] **PWA-02**: App loads offline to a cached app shell
+- [x] **PWA-03**: App provides iOS Add to Home Screen guidance
 
 ### Private Use Guidance
 
-- [ ] **PRIV-01**: App displays a brief privacy notice explaining the passcode is a personal gate
+- [x] **PRIV-01**: App displays a brief privacy notice explaining the passcode is a personal gate
 
 ## v2 Requirements
 
@@ -53,13 +53,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ACCESS-01 | Phase 4 | Pending |
-| ACCESS-02 | Phase 4 | Pending |
-| ACCESS-03 | Phase 4 | Pending |
-| PWA-01 | Phase 5 | Pending |
-| PWA-02 | Phase 5 | Pending |
-| PWA-03 | Phase 5 | Pending |
-| PRIV-01 | Phase 4 | Pending |
+| ACCESS-01 | Phase 4 | Complete |
+| ACCESS-02 | Phase 4 | Complete |
+| ACCESS-03 | Phase 4 | Complete |
+| PWA-01 | Phase 5 | Complete |
+| PWA-02 | Phase 5 | Complete |
+| PWA-03 | Phase 5 | Complete |
+| PRIV-01 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 7 total
