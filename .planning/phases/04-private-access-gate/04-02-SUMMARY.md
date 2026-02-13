@@ -55,7 +55,7 @@ Each task was committed atomically:
 
 1. **Task 1: Add root proxy gate artifact matching active logic** - `f935519` (feat)
 
-**Plan metadata:** (docs commit pending)
+**Plan metadata:** `4cbc861` (docs: complete plan)
 
 ## Files Created/Modified
 - `proxy.ts` - Root-level proxy gate artifact mirroring src/proxy.ts logic
