@@ -35,7 +35,7 @@ export const CoffeeForm = () => {
     });
 
     if (!result.success) {
-      const fieldErrors = result.error.formErrors.fieldErrors;
+      const fieldErrors = result.error.flatten().fieldErrors;
       setErrors({
         name: fieldErrors.name?.[0],
         origin: fieldErrors.origin?.[0],
@@ -101,7 +101,12 @@ export const CoffeeForm = () => {
           </span>
           <select
             value={process}
-            onChange={(event) => setProcess(event.target.value)}
+            onChange={(event) => {
+              const parsed = CoffeeProcessSchema.safeParse(event.target.value);
+              if (parsed.success) {
+                setProcess(parsed.data);
+              }
+            }}
             className="h-12 rounded-2xl border border-[#e0d3c3] bg-white px-4 text-base text-[#2c2218] shadow-sm focus:border-[#2c2218] focus:outline-none"
           >
             {processOptions.map((option) => (

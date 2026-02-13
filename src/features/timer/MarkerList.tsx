@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 
+import type { RoastEvent } from "@/domain/roast-session/types";
+
 import { formatElapsedMs } from "@/shared/format/time";
 
 import { useTimerStore } from "@/features/timer/timerStore";
@@ -10,6 +12,11 @@ const markerLabels: Record<"FIRST_CRACK" | "DROP", string> = {
   FIRST_CRACK: "First Crack",
   DROP: "Drop",
 };
+
+const isMarkerEvent = (
+  event: RoastEvent
+): event is RoastEvent & { type: "FIRST_CRACK" | "DROP" } =>
+  event.type === "FIRST_CRACK" || event.type === "DROP";
 
 export const MarkerList = () => {
   const events = useTimerStore((state) => state.events);
@@ -20,7 +27,7 @@ export const MarkerList = () => {
 
   const markers = useMemo(() => {
     return events
-      .filter((event) => event.type === "FIRST_CRACK" || event.type === "DROP")
+      .filter(isMarkerEvent)
       .slice()
       .sort((a, b) => b.at - a.at);
   }, [events]);

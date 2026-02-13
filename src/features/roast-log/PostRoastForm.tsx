@@ -45,7 +45,7 @@ export const PostRoastForm = () => {
     });
 
     if (!result.success) {
-      const fieldErrors = result.error.formErrors.fieldErrors;
+      const fieldErrors = result.error.flatten().fieldErrors;
       setErrors({
         roastLevel: fieldErrors.roastLevel?.[0],
         roastedWeightGrams: fieldErrors.roastedWeightGrams?.[0],

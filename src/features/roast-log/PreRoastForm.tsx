@@ -84,7 +84,7 @@ export const PreRoastForm = () => {
     });
 
     if (!result.success) {
-      const fieldErrors = result.error.formErrors.fieldErrors;
+      const fieldErrors = result.error.flatten().fieldErrors;
       setErrors({
         selectedLotId: fieldErrors.selectedLotId?.[0],
         greenWeightGrams: fieldErrors.greenWeightGrams?.[0],

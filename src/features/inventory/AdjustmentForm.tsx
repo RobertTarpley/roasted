@@ -87,7 +87,12 @@ export const AdjustmentForm = ({ lotId }: AdjustmentFormProps) => {
         </span>
         <select
           value={reason}
-          onChange={(event) => setReason(event.target.value)}
+          onChange={(event) => {
+            const parsed = AdjustmentReasonSchema.safeParse(event.target.value);
+            if (parsed.success) {
+              setReason(parsed.data);
+            }
+          }}
           className="h-10 rounded-2xl border border-[#e0d3c3] bg-white px-3 text-sm text-[#2c2218] shadow-sm focus:border-[#2c2218] focus:outline-none"
         >
           {reasonOptions.map((option) => (

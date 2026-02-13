@@ -35,7 +35,7 @@ export const LotForm = ({ coffeeId }: LotFormProps) => {
     });
 
     if (!result.success) {
-      const fieldErrors = result.error.formErrors.fieldErrors;
+      const fieldErrors = result.error.flatten().fieldErrors;
       setErrors({
         coffeeId: fieldErrors.coffeeId?.[0],
         label: fieldErrors.label?.[0],
