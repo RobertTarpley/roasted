@@ -11,7 +11,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 - [ ] **ACCESS-01**: User must enter a passcode before any app content is shown
 - [ ] **ACCESS-02**: Passcode is validated using a server-side env var (no client-visible secret)
-- [ ] **ACCESS-03**: User can lock the app and the unlock persists for the current session
+- [ ] **ACCESS-03**: Unlock persists for the browser session and re-locks on tab close
 
 ### PWA Install
 
