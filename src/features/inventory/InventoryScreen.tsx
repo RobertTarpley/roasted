@@ -207,6 +207,12 @@ export const InventoryScreen = () => {
             >
               History
             </Link>
+            <Link
+              href="/install"
+              className="transition hover:text-[#2c2218]"
+            >
+              Install
+            </Link>
           </nav>
         </header>
 
