@@ -13,7 +13,7 @@ This milestone makes the app privately accessible and installable as a PWA for p
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 4: Private Access Gate** - Passcode gate with session lock and privacy notice
-- [ ] **Phase 5: PWA Install + Offline Shell** - Installable PWA with offline launch and iOS guidance
+- [x] **Phase 5: PWA Install + Offline Shell** - Installable PWA with offline launch and iOS guidance
 
 ## Phase Details
 
@@ -43,7 +43,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md — PWA manifest, offline shell, and iOS install guidance
+- [x] 05-01-PLAN.md — PWA manifest, offline shell, and iOS install guidance
 
 ## Progress
 
@@ -53,4 +53,4 @@ Phases execute in numeric order: 4 → 4.1 → 4.2 → 5 → 5.1 → 5.2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 4. Private Access Gate | 2/2 | Complete | 2026-02-13 |
-| 5. PWA Install + Offline Shell | 0/1 | Not started | - |
+| 5. PWA Install + Offline Shell | 1/1 | Complete | 2026-02-13 |
