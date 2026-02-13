@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Make it effortless to time a roast and capture the key metrics and notes so I can track results over time.
-**Current focus:** Phase 2 - Inventory + History
+**Current focus:** Milestone v1.0 Private PWA (defining requirements)
 
 ## Current Position
 
-**Phase:** 2 of 3 (Inventory + History)
-**Current Plan:** 3
-**Total Plans in Phase:** 3
-**Status:** Phase complete — ready for verification
-**Last Activity:** 2026-02-12
+**Phase:** Not started (defining requirements)
+**Current Plan:** —
+**Total Plans in Phase:** —
+**Status:** Defining requirements
+**Last Activity:** 2026-02-12 — Milestone v1.0 started
 
-**Progress:** [██████████] 100%
+**Progress:** [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 

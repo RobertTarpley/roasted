@@ -8,6 +8,15 @@ A mobile-friendly app to time coffee roasts, log key roast splits, and save roas
 
 Make it effortless to time a roast and capture the key metrics and notes so I can track results over time.
 
+## Current Milestone: v1.0 Private PWA
+
+**Goal:** Make the app privately accessible and installable as a PWA on phone and desktop.
+
+**Target features:**
+- Passcode gate using server-side env var
+- PWA install support (manifest + icons)
+- Private access guidance for personal use
+
 ## Requirements
 
 ### Validated
@@ -16,9 +25,9 @@ Make it effortless to time a roast and capture the key metrics and notes so I ca
 
 ### Active
 
-- [ ] Roast timer with split phases (overall, development, cooling) and saved metrics
-- [ ] Green coffee inventory with per-roast usage tracking
-- [ ] Roast history with notes, roast level, and roast yield %
+- [ ] Private access via passcode gate
+- [ ] Installable PWA on iPhone and desktop
+- [ ] Simple personal-use deployment flow
 
 ### Out of Scope
 
@@ -45,4 +54,4 @@ Make it effortless to time a roast and capture the key metrics and notes so I ca
 | Mobile-friendly web app for v1 | Avoid App Store friction while still working on iPhone | — Pending |
 
 ---
-*Last updated: 2026-02-12 after initialization*
+*Last updated: 2026-02-12 after v1.0 Private PWA kickoff*
